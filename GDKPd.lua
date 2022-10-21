@@ -26,7 +26,7 @@ local DEBUGFORCEVERSION
 
 --[===[@debug@
 DEBUGFORCEVERSION="2.0.0"
---@end-debug@]===]
+--@end-debug@]==]]===]
 -- fetch locale data
 local L = LibStub("AceLocale-3.0"):GetLocale("GDKPd")
 -- versioning info
@@ -417,7 +417,7 @@ GDKPd:SetScript("OnUpdate", function(self, elapsed)
 			if (curPot ~= math.floor(aucdata.timeRemains / self.opt.countdownTimerJump)) and
 				(curPot * self.opt.countdownTimerJump < self.opt.auctionTimer) and
 				(not (next(aucdata.bidders, nil) and (curPot * self.opt.countdownTimerJump == self.opt.auctionTimerRefresh))) and
-				(curPot > 0) then
+				(curPot > 0) and (aucdata.timeRemains < 6) then
 				SendChatMessage("[Caution] " ..
 					(curPot * self.opt.countdownTimerJump) .. " seconds remaining for item " .. item ..
 					"!", "RAID")
@@ -2023,14 +2023,14 @@ function GDKPd:AnnounceLoot(shouldQueueAuctions)
 	for lootNum, link in ipairs(lootList) do
 		if lootNum > 1 then
 			if strlen(lootString) + strlen(link) + 2 > 255 then
-				SendChatMessage(lootString, "RAID")
+				SendChatMessage(lootString, "RAID_WARNING")
 				lootString = link
 			else
 				lootString = lootString .. ", " .. link
 			end
 		end
 	end
-	SendChatMessage(lootString, "RAID")
+	SendChatMessage(lootString, "RAID_WARNING")
 	for _, item in ipairs(lootList) do
 		if shouldQueueAuctions then
 			local itemID = tonumber(item:match("|Hitem:(%d+):"))
@@ -2040,7 +2040,7 @@ function GDKPd:AnnounceLoot(shouldQueueAuctions)
 			--GDKPd:QueueAuction(item, startBid, increment)
 			GDKPd:QueueAuction(item, GDKPd:GetStartBid(itemID), GDKPd:GetMinIncrement(itemID))
 		else
-			SendAddonMessage("GDKPD START", item, "RAID")
+			--SendAddonMessage("GDKPD START", item, "RAID")
 		end
 	end
 	lootList:Release()
@@ -2060,19 +2060,16 @@ function GDKPd:AuctionOffItem(item, minbid, increment)
 	if (self.opt.allowMultipleAuctions) and (self.curAuctions[item]) then return end
 	if (not self.opt.allowMultipleAuctions) then
 		-- old code
-		SendChatMessage(("Bidding starts on %s. Please bid in raid chat, starting bid %d gold, minimum increment %d gold."):
-			format(item, minbid, increment, self.opt.auctionTimer, self.opt.auctionTimerRefresh),
-			(self.opt.announceRaidWarning and (IsRaidOfficer() or IsRaidLeader())) and "RAID_WARNING" or "RAID")
-		GDKPd.curAuction.item = item
-		GDKPd.curAuction.curBid = (minbid - increment)
-		GDKPd.curAuction.increment = increment
-		GDKPd.curAuction.bidders = emptytable()
-		GDKPd.curAuction.timeRemains = self.opt.auctionTimer
 	else
 		-- new code
+		local itemId = GetItemInfoFromHyperlink(item)
+		local maxBid = MaxBidSmall
+		if (LargeBidItems[itemId]) then
+			maxBid = LargeBidItems[itemId]
+		end
 		SendChatMessage((
-			"Bidding starts on %s. Bid using format '[item] 1000', starting bid %d gold, minimum increment %d gold. TTL: %d/%d"):
-			format(item, minbid, increment, self.opt.auctionTimer, self.opt.auctionTimerRefresh),
+			"Bidding starts on %s. Starting bid %dg, minimum increment %dg. Maximum bid %dg. TTL: %d/%d"):
+			format(item, minbid, increment, maxBid, self.opt.auctionTimer, self.opt.auctionTimerRefresh),
 			(self.opt.announceRaidWarning and (IsRaidOfficer() or IsRaidLeader())) and "RAID_WARNING" or "RAID")
 		local aucTable = emptytable()
 		aucTable.item = item
@@ -2161,8 +2158,13 @@ function GDKPd:FinishAuction(link)
 					paymentString = paymentString .. ", " .. thirdShare .. " to " .. aucdata.bidders[3].bidderName
 				end
 				paymentString = paymentString:format(remAmount)
-				SendChatMessage(("Auction finished for %s. Winner: %s. %s."):format(link, aucdata.bidders[1].bidderName,
-					paymentString), "RAID")
+				
+				if aucdata.maxBid and tonumber(aucdata.maxBid) == tonumber(totalAmount) then					
+					SendChatMessage(("Auction finished for %s. %s. Please check who won the roll."):format(link, paymentString), "RAID")
+				else
+					SendChatMessage(("Auction finished for %s. Winner: %s. %s."):format(link, aucdata.bidders[1].bidderName,
+						paymentString), "RAID")
+				end
 				GDKPd_PotData.potAmount = (GDKPd_PotData.potAmount or 0) + remAmount
 				GDKPd_PotData.playerBalance[aucdata.bidders[1].bidderName] = GDKPd_PotData.playerBalance[
 					aucdata.bidders[1].bidderName] - remAmount
@@ -2349,7 +2351,7 @@ function GDKPd:GetUnoccupiedFrame()
 	f.itemstring:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE")
 	f.itemstring:SetTextColor(1, 1, 1)
 	f.itemstring:SetPoint("TOPLEFT", f.icon, "TOPRIGHT", 5, 0)
-	f.itemstring:SetWidth(160)
+	f.itemstring:SetWidth(260)
 	f.itemstring:SetWordWrap(false)
 	f.itemstring:SetJustifyH("LEFT")
 	f.curbid = f:CreateFontString()
@@ -2366,13 +2368,13 @@ function GDKPd:GetUnoccupiedFrame()
 	f.highestbidder:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
 	f.highestbidder:SetTextColor(1, 1, 1)
 	f.highestbidder:SetPoint("TOPLEFT", f.curbid, "BOTTOMLEFT", 0, -5)
-	f.timer = CreateFrame("Cooldown", nil, f)
+	f.timer = CreateFrame("Cooldown", nil, f, "CooldownFrameTemplate")
 	-- omnicc stuff
 	f.timer.noCooldownCount = true
 	f.timer:SetReverse(true)
 	f.timer:SetAllPoints(f.icon)
 	f.timer.update = CreateFrame("Frame")
-	f.timer.update:Hide()
+	-- f.timer.update:Hide()
 	f.timer.update:SetScript("OnUpdate", function(self)
 		local timeRemain = self.endTime - GetTime()
 		if timeRemain <= 0 then
@@ -2391,9 +2393,10 @@ function GDKPd:GetUnoccupiedFrame()
 		"OUTLINE")
 	f.timer.text:SetAllPoints()
 	f.timer.text:Hide()
+
 	f.autobid = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
 	f.autobid:SetText(L["Auto bid"])
-	f.autobid:SetSize(70, 16)
+	f.autobid:SetSize(0, 0)
 	f.autobid:SetScript("OnClick", function(self)
 		StaticPopup_Show("GDKPD_AUTOBID", f.itemlink).data = f
 		f.hide:Disable()
@@ -2409,6 +2412,7 @@ function GDKPd:GetUnoccupiedFrame()
 		f.autobid:Show()
 		f.hide:Enable()
 	end)
+	
 	f.bidbox = CreateFrame("EditBox", nil, f, BackdropTemplateMixin and "BackdropTemplate")
 	f.bidbox:SetMultiLine(nil)
 	f.bidbox:SetScript("OnEditFocusGained", function(self)
@@ -2445,14 +2449,26 @@ function GDKPd:GetUnoccupiedFrame()
 	f.bidbox:Hide()
 	f.bid = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
 	f.bid:SetText(L["Bid"])
-	f.bid:SetSize(70, 16)
-	f.bid:SetPoint("TOP", f.autobid, "BOTTOM", 0, -8)
+	f.bid:SetSize(50, 16)
+	f.bid:SetPoint("RIGHT", f.bidbox, "RIGHT", 115, 0)
 	f.bid:SetScript("OnClick", function(self)
 		local newBid = f.curbidamount + f.bidIncrement
+		local wantBid = f.bidbox:GetNumber()
+		if wantBid < (f.bidIncrement + f.curbidamount) then
+			return
+		end
+		
+		if (wantBid >= f.maxBid) then
+			wantBid = f.maxBid
+			if (not self.rolled) then
+				RandomRoll(1, 100)
+			end
+			self.rolled = true
+		end
 		if f.isMultiBid then
-			SendChatMessage(f.itemlink .. " " .. newBid, "RAID")
+			SendChatMessage(f.itemlink .. " " .. wantBid, "RAID")
 		else
-			SendChatMessage(tostring(newBid), "RAID")
+			SendChatMessage(tostring(wantBid), "RAID")
 		end
 	end)
 	f.bid:Disable()
@@ -2460,8 +2476,67 @@ function GDKPd:GetUnoccupiedFrame()
 	f.bid.enabledelay:Hide()
 	f.bid.enabledelay:SetScript("OnUpdate", function(self)
 		if not self.reenabletime then self:Hide() return end
+		if self.curbidamount and self.maxBid and self.curbidamount >= self.maxBid then return end
 		if GetTime() >= self.reenabletime then f.bid:Enable() self.reenabletime = nil self:Hide() end
 	end)
+
+	f.roll = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
+	f.roll:SetText("Roll")
+	f.roll:SetSize(50, 16)
+	f.roll:SetPoint("LEFT", f.bid, "LEFT", -55, 0)
+	f.rolled = false
+	f.roll:SetScript("OnClick", function(self)
+		local newBid = f.maxBid
+		if (f.rolled) then
+			return
+		end
+
+		f.rolled = true
+		if f.isMultiBid then
+			SendChatMessage(f.itemlink .. " " .. newBid, "RAID")
+		else
+			SendChatMessage(tostring(newBid), "RAID")
+		end
+		RandomRoll(1, 100)
+	end)
+
+	f.roll:Disable()
+	f.roll.enabledelay = CreateFrame("Frame", nil, f.bid)
+	f.roll.enabledelay:Hide()
+	f.roll.enabledelay:SetScript("OnUpdate", function(self)
+		if not self.reenabletime then self:Hide() return end
+		if GetTime() >= self.reenabletime then f.roll:Enable() self.reenabletime = nil self:Hide() end
+	end)
+
+	f.increment = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
+	f.increment:SetText("Increment")
+	f.increment:SetSize(80, 16)
+	f.increment:SetPoint("BOTTOM", f.roll, "BOTTOM", 15, -16)
+	f.increment:SetScript("OnClick", function(self)
+		local newBid = f.curbidamount + f.bidIncrement
+		if (newBid >= f.maxBid) then
+			newBid = f.maxBid
+			if (not self.rolled) then
+				RandomRoll(1, 100)
+			end
+			self.rolled = true
+		end
+		if f.isMultiBid then
+			SendChatMessage(f.itemlink .. " " .. newBid, "RAID")
+		else
+			SendChatMessage(tostring(newBid), "RAID")
+		end
+	end)
+
+	f.increment:Disable()
+	f.increment.enabledelay = CreateFrame("Frame", nil, f.bid)
+	f.increment.enabledelay:Hide()
+	f.increment.enabledelay:SetScript("OnUpdate", function(self)
+		if not self.reenabletime then self:Hide() return end
+		if self.curbidamount and self.maxBid and self.curbidamount >= self.maxBid then return end
+		if GetTime() >= self.reenabletime then f.increment:Enable() self.reenabletime = nil self:Hide() end
+	end)
+
 	--f.hide = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
 	f.hide = CreateFrame("Button", nil, f, "UIPanelCloseButton")
 	--f.hide:SetText(L["Hide"])
@@ -2495,8 +2570,8 @@ function GDKPd:GetUnoccupiedFrame()
 	f.restartAuction = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
 	f.restartAuction:SetText(L["Restart auction"])
 	f.restartAuction:SetHeight(15)
-	f.restartAuction:SetPoint("BOTTOMLEFT", f.bigHide, "TOPLEFT", 0, 5)
-	f.restartAuction:SetPoint("BOTTOMRIGHT", f.bigHide, "TOPRIGHT", 0, 5)
+	f.restartAuction:SetPoint("BOTTOMLEFT", f.bigHide, "TOPLEFT", 0, 2)
+	f.restartAuction:SetPoint("BOTTOMRIGHT", f.bigHide, "TOPRIGHT", 0, 2)
 	f.restartAuction:SetScript("OnClick", function(self)
 		f:Hide()
 		local itemLink = f.itemlink
@@ -2526,8 +2601,14 @@ function GDKPd:GetUnoccupiedFrame()
 	end
 	f.reverseBid:Disable()
 	function f:SetItem(itemlink)
+		self.itemId = GetItemInfoFromHyperlink(itemlink)
+		self.maxBid = MaxBidSmall
+		if (LargeBidItems[self.itemId]) then
+			self.maxBid = LargeBidItems[self.itemId]
+		end
+
 		self.icon:SetTexture((select(10, GetItemInfo(itemlink))))
-		self.itemstring:SetText(itemlink)
+		self.itemstring:SetText(itemlink .. " Max: " .. tostring(self.maxBid) .. "g")
 		self:EnableMouse(true)
 		self.autobid:Enable()
 		self.bidbox:Enable()
@@ -2538,11 +2619,17 @@ function GDKPd:GetUnoccupiedFrame()
 
 	function f:SetCurBid(goldAmount, bidderName, isMine, isInitial)
 		self.curbid:SetText((isInitial and L["Minimum bid: "] or L["Current bid: "]) .. goldAmount .. "|cffffd100g|r")
-		if bidderName and (not isMine) then
+		if (not isMine and self.curbidamount and tonumber(self.curbidamount) == tonumber(goldAmount) and self.maxBid and tonumber(goldAmount) >= tonumber(self.maxBid)) then
+			-- don't change
+		elseif bidderName and (not isMine) then
 			self.highestbidder:Show()
 			self.highestbidder:SetText(L["Highest bidder: %s"]:format(bidderName))
 			self.highestbid:Hide()
 		elseif isMine then
+			self.highestbid:SetText("You are the top bidder!")
+			if self.maxBid and tonumber(goldAmount) >= tonumber(self.maxBid) then
+				self.highestbid:SetText("You are one of the top bidders!")
+			end
 			self.highestbid:Show()
 			self.highestbidder:Hide()
 		else
@@ -2554,11 +2641,23 @@ function GDKPd:GetUnoccupiedFrame()
 		self.curbid:Show()
 		self.bidbox:Show()
 		self.bid:Enable()
+		self.roll:Enable()
+		self.increment:Enable()
 		if not isInitial then
 			self.bid:Disable()
+			self.roll:Disable()
+			self.increment:Disable()
 			if not isMine then
-				self.bid.enabledelay.reenabletime = GetTime() + GDKPd.opt.bidButtonReenableDelay
-				self.bid.enabledelay:Show()
+				if (not self.rolled) then
+					self.bid.enabledelay.reenabletime = GetTime() + GDKPd.opt.bidButtonReenableDelay
+					self.bid.enabledelay:Show()
+					
+					self.increment.enabledelay.reenabletime = GetTime() + GDKPd.opt.bidButtonReenableDelay
+					self.increment.enabledelay:Show()
+
+					self.roll.enabledelay.reenabletime = GetTime() + GDKPd.opt.bidButtonReenableDelay
+					self.roll.enabledelay:Show()
+				end
 			end
 			if goldAmount > (self.initialBid or math.huge) then
 				self.reverseBid:Enable()
@@ -2663,10 +2762,10 @@ local defaults = { profile = {
 	autoAwardLoot = false,
 	awardToML = false,
 	showAuctionDurationTimer = true,
-	showAuctionDurationTimerText = false,
+	showAuctionDurationTimerText = true,
 	announceRaidWarning = true,
 	announceBidRaidWarning = false,
-	allowMultipleAuctions = false,
+	allowMultipleAuctions = true,
 	announcePotAfterAuction = true,
 	hideChatMessages = {
 		auctionAnnounce = false,
@@ -2857,7 +2956,7 @@ GDKPd.options = {
 				auctionTimer = {
 					type = "range",
 					softMin = 5,
-					softMax = 30,
+					softMax = 300,
 					order = 7,
 					name = L["Auction timeout"],
 					desc = L["The amount of seconds that have to pass before the auction is closed without bids recieved"],
@@ -2867,7 +2966,7 @@ GDKPd.options = {
 				auctionTimerRefresh = {
 					type = "range",
 					softMin = 5,
-					softMax = 30,
+					softMax = 300,
 					order = 8,
 					name = L["Auction bid timeout refresh"],
 					desc = L["The amount of seconds that have to pass after a bid before the auction is closed"],
@@ -2918,15 +3017,6 @@ GDKPd.options = {
 					get = function() return GDKPd.opt.announceBidRaidWarning end,
 					order = 12,
 				},
-				allowMultiple = {
-					type = "toggle",
-					name = L["Allow multiple simultanous auctions"],
-					width = "full",
-					set = function(info, value) GDKPd.opt.allowMultipleAuctions = value end,
-					get = function() return GDKPd.opt.allowMultipleAuctions end,
-					disabled = function() return ((GDKPd.curAuctions and (#GDKPd.curAuctions > 0)) or (GDKPd.curAuction.item)) end,
-					order = 13,
-				},
 				announcePotAfterAuction = {
 					type = "toggle",
 					name = L["Announce the current pot amount after each auction"],
@@ -2959,23 +3049,6 @@ GDKPd.options = {
 			type = "group",
 			name = L["Appearance options"],
 			args = {
-				showtimer = {
-					set = function(info, value) GDKPd.opt.showAuctionDurationTimer = value end,
-					get = function() return GDKPd.opt.showAuctionDurationTimer end,
-					type = "toggle",
-					name = L["Show auction duration spiral"],
-					width = "full",
-					order = 1,
-				},
-				showtimertext = {
-					disabled = function() return not GDKPd.opt.showAuctionDurationTimer end,
-					set = function(info, value) GDKPd.opt.showAuctionDurationTimerText = value end,
-					get = function() return GDKPd.opt.showAuctionDurationTimerText end,
-					type = "toggle",
-					name = L["Show countdown text on auction duration spiral"],
-					width = "full",
-					order = 2,
-				},
 				hideChats = {
 					type = "multiselect",
 					name = L["Hide chat messages"],
@@ -3254,163 +3327,30 @@ GDKPd:SetScript("OnEvent", function(self, event, ...)
 			self.opt.playerbalancepoint.x, self.opt.playerbalancepoint.y)
 		self.playerBalance:Update()
 		self.status:UpdateVisibility()
+		GDKPd.opt.allowMultipleAutions = true
+		GDKPd.opt.showAuctionDurationTimer = true
+		GDKPd.opt.showAuctionDurationTimerText = true
 	end
 	if (event == "CHAT_MSG_RAID") or (event == "CHAT_MSG_RAID_LEADER") or (event == "CHAT_MSG_RAID_WARNING") then
 		local msg, sender = arg[1], pruneCrossRealm(arg[2])
-		--this is code for single-auction mode. put into a do branch to avoid local clashes.
-		do
-			local itemLink, minBid, bidIncrement, auctionTimer, auctionTimerRefresh = string.match(msg,
-				"Bidding starts on (|c........|Hitem:.+|r). Please bid in raid chat, starting bid (%d+) gold, minimum increment (%d+) gold. TTL: (%d+)/(%d+)")
-			if not itemLink then
-				-- backwards comp number three
-				itemLink, minBid, bidIncrement, auctionTimer, auctionTimerRefresh = string.match(msg,
-					"Bidding starts on (|c........|Hitem:.+|r). Please bid in raid chat, starting bid (%d+) gold, minimum increment (%d+) gold. TTL until expire: (%d+) seconds, TTL after bid: (%d+) seconds.")
-			end
-			if not itemLink then
-				-- backwords compability strikes again
-				itemLink, minBid, bidIncrement, auctionTimer = string.match(msg,
-					"Bidding starts on (|c........|Hitem:.+|r). Please bid in raid chat, starting bid (%d+) gold, minimum increment (%d+) gold. TTL after a bid is placed: (%d+) seconds.")
-				auctionTimerRefresh = auctionTimer
-			end
-			if not itemLink then
-				-- backwards version compability
-				itemLink, minBid, bidIncrement = string.match(msg,
-					"Bidding starts on (|c........|Hitem:.+|r). Please bid in raid chat, starting bid (%d+) gold, minimum increment (%d+) gold.")
-				auctionTimer = 0
-				auctionTimerRefresh = 0
-			end
-			auctionTimer = tonumber(auctionTimer) or 0
-			auctionTimerRefresh = tonumber(auctionTimerRefresh) or 0
-			if itemLink and self:PlayerIsML(sender, false) then
-				if not self.ignoredLinks[itemLink] then
-					local f = GDKPd:FetchFrameFromLink(itemLink)
-					if not f then
-						f = self:GetUnoccupiedFrame()
-						f:SetItem(itemLink)
-						f.isActive = true
-						f:Show()
-					end
-					f.isMultiBid = false
-					self.InProgressBidFrame = f
-					f.bidIncrement = bidIncrement
-					f:SetCurBid(minBid, false, false, true)
-					f:SetAuctionTimer(auctionTimer, auctionTimerRefresh)
-					if f.maxAutoBid then
-						local newBid = tonumber(minBid)
-						if newBid < f.maxAutoBid then
-							SendChatMessage(tostring(newBid), "RAID")
-						end
-					end
-				else
-					self.ignoredLinks[itemLink] = nil
-				end
-			end
-			if self.curAuction.item and msg:find("%d+") == 1 then
-				local newBid = tonumber(msg:match("([0-9]+%.?[0-9]*)[kK]"))
-				if not newBid then
-					newBid = tonumber(msg:match("%d+"))
-				else
-					newBid = math.floor(newBid * 1000)
-				end
-
-				-- Ignore obnoxiously large numbers, they break %d formats and are over gold cap anyway
-				if newBid < 999999999 and (self.curAuction.curBid + self.curAuction.increment) <= newBid then
-					GDKPd.curAuction.curBid = newBid
-					if GDKPd.curAuction.bidders[sender] then
-						GDKPd.curAuction.bidders[GDKPd.curAuction.bidders[sender]].bidAmount = newBid
-					else
-						tinsert(GDKPd.curAuction.bidders, { bidAmount = newBid, bidderName = sender })
-						GDKPd.curAuction.bidders[sender] = #GDKPd.curAuction.bidders
-					end
-					SendChatMessage(("New highest bidder: %s (%d gold)"):format(sender, newBid),
-						(self.opt.announceBidRaidWarning and (IsRaidOfficer() or IsRaidLeader())) and "RAID_WARNING" or "RAID")
-					self.curAuction.timeRemains = math.max(self.opt.auctionTimerRefresh, self.curAuction.timeRemains)
-				end
-			end
-			local bidderName, newBid = string.match(msg, "New highest bidder: (%S+) %((%d+) gold%)")
-			if bidderName and self.InProgressBidFrame then
-				local isSelf = pruneCrossRealm(bidderName) == (UnitName("player"))
-				self.InProgressBidFrame:SetCurBid(newBid, bidderName, isSelf)
-				self.InProgressBidFrame:ResetAuctionTimer()
-				if not isSelf then
-					if self.InProgressBidFrame.maxAutoBid then
-						local myNewBid = newBid + self.InProgressBidFrame.bidIncrement
-						if myNewBid <= self.InProgressBidFrame.maxAutoBid then
-							SendChatMessage(tostring(myNewBid), "RAID")
-						end
-					end
-				end
-			end
-			if msg:find("Auction finished.") and GDKPd:PlayerIsML(sender, false) and self.InProgressBidFrame then
-				self.InProgressBidFrame:Hide()
-				self.InProgressBidFrame.isActive = false
-				self.InProgressBidFrame = nil
-				local winnerName, paymentString = msg:match("Auction finished. Winner: (%S+). (.+).")
-				if winnerName then
-					if pruneCrossRealm(winnerName) == (UnitName("player")) then
-						for targetAmount, targetName in paymentString:gmatch("(%d+) to (%S+)[%.,]") do
-							local tarName = pruneCrossRealm(targetName)
-							if GDKPd:PlayerIsML((UnitName("player")), true) then
-								GDKPd_PotData.playerBalance[tarName == "pot" and sender or tarName] = GDKPd_PotData.playerBalance[
-									tarName == "pot" and sender or tarName] + targetAmount
-								GDKPd.balance:Update()
-							else
-								GDKPd_BalanceData[tarName == "pot" and sender or tarName] = GDKPd_BalanceData[
-									tarName == "pot" and sender or tarName] + targetAmount
-								GDKPd.playerBalance:Update()
-							end
-						end
-					else
-						for targetAmount, targetName in paymentString:gmatch("(%d+) to (%S+)[%.,]") do
-							if pruneCrossRealm(targetName) == (UnitName("player")) then
-								if GDKPd:PlayerIsML((UnitName("player")), true) then
-									GDKPd_PotData.playerBalance[winnerName] = GDKPd_PotData.playerBalance[winnerName] - targetAmount
-									GDKPd.balance:Update()
-								else
-									GDKPd_BalanceData[winnerName] = GDKPd_BalanceData[winnerName] - targetAmount
-									GDKPd.playerBalance:Update()
-								end
-							end
-						end
-					end
-				end
-			end
-			if msg:find("Auction cancelled.") and GDKPd:PlayerIsML(sender, false) and self.InProgressBidFrame then
-				self.InProgressBidFrame.isActive = false
-				if GDKPd:PlayerIsML((UnitName("player")), true) then
-					local f = self.InProgressBidFrame
-					self.InProgressBidFrame = nil
-					f.timer:Hide()
-					f.timer.update:Hide()
-					f.curbid:Hide()
-					f.highestbidder:Hide()
-					f.highestbid:Hide()
-					f.bidbox:Hide()
-					f.bid:Disable()
-					f.autobid:Disable()
-				else
-					self.InProgressBidFrame:Hide()
-				end
-			end
-		end
+		
+		-- this is code for single-auction mode. put into a do branch to avoid local clashes.
+		-- deleted
 		-- this is new code for multi-auction. slight variations are used rl-side to indicate this.
 		do
-			local itemLink, minBid, bidIncrement, auctionTimer, auctionTimerRefresh = string.match(msg,
-				"Bidding starts on (|c........|Hitem:.+|r). Bid using format '%[item%] 1000', starting bid (%d+) gold, minimum increment (%d+) gold. TTL: (%d+)/(%d+)")
-			if not itemLink then
-				-- backwards to non-shortened
-				itemLink, minBid, bidIncrement, auctionTimer, auctionTimerRefresh = string.match(msg,
-					"Bidding starts on (|c........|Hitem:.+|r). Bid using format '%[item%] 1000', starting bid (%d+) gold, minimum increment (%d+) gold. TTL until expire: (%d+) seconds, TTL after bid: (%d+) seconds.")
-			end
-			if not itemLink then
-				itemLink, minBid, bidIncrement, auctionTimer = string.match(msg,
-					"Bidding starts on (|c........|Hitem:.+|r). Please bid in raid chat, using format 'itemlink bid'. Starting bid (%d+) gold, minimum increment (%d+) gold. TTL after a bid is placed: (%d+) seconds.")
-				auctionTimerRefresh = auctionTimer
-			end
+			local itemLink, minBid, bidIncrement, maxBid, auctionTimer, auctionTimerRefresh = string.match(msg,
+				"Bidding starts on (|c........|Hitem:.+|r). Starting bid (%d+)g, minimum increment (%d+)g. Maximum bid (%d+)g. TTL: (%d+)/(%d+)")
+
+				
 			auctionTimer = tonumber(auctionTimer) or 0
 			auctionTimerRefresh = tonumber(auctionTimerRefresh) or 0
+			
 			if itemLink and self:PlayerIsML(sender, false) then
+				
 				if not self.ignoredLinks[itemLink] then
+
+					local itemId = GetItemInfoFromHyperlink(itemLink)
+					LargeBidItems[itemId] = tonumber(maxBid);
 					local f = GDKPd:FetchFrameFromLink(itemLink)
 					if not f then
 						f = self:GetUnoccupiedFrame()
@@ -3418,6 +3358,7 @@ GDKPd:SetScript("OnEvent", function(self, event, ...)
 						f.isActive = true
 						f:Show()
 					end
+					f.rolled = false
 					f.isMultiBid = true
 					f.bidIncrement = bidIncrement
 					f:SetCurBid(minBid, false, false, true)
@@ -3433,16 +3374,23 @@ GDKPd:SetScript("OnEvent", function(self, event, ...)
 				end
 			end
 			local bidItemLink, bidAmount = msg:match("(|c........|Hitem:.+|r)%s*([0-9]+%.?[0-9]*)[kK]")
-			if not bidItemLink then
-				bidItemLink, bidAmount = msg:match("(|c........|Hitem:.+|r)%s*(%d+)")
-			else
-				bidAmount = math.floor(bidAmount * 1000)
-			end
+            if not bidItemLink then
+                bidItemLink, bidAmount = msg:match("(|c........|Hitem:.+|r)%s*(%d+)")
+            else
+                bidAmount = math.floor(bidAmount * 1000)
+            end
 			if bidItemLink then
 				if self.curAuctions[bidItemLink] then
 					local aucdata = self.curAuctions[bidItemLink]
+
+					local itemId = GetItemInfoFromHyperlink(bidItemLink)
+					maxBid = MaxBidSmall
+					if (LargeBidItems[itemId]) then
+						maxBid = LargeBidItems[itemId]
+					end
+					aucdata.maxBid = maxBid 
 					bidAmount = tonumber(bidAmount)
-					if (aucdata.curBid + aucdata.increment) <= bidAmount then
+					if (aucdata.curBid + aucdata.increment) <= bidAmount or maxBid <= bidAmount then
 						aucdata.curBid = bidAmount
 						if aucdata.bidders[sender] then
 							aucdata.bidders[aucdata.bidders[sender]].bidAmount = bidAmount
@@ -3540,6 +3488,12 @@ GDKPd:SetScript("OnEvent", function(self, event, ...)
 	if (event == "CHAT_MSG_ADDON") then
 		local sender = pruneCrossRealm(arg[4])
 		if sender then
+			if arg[1] == "GDKPD VER" then
+				print(sender .. ": " .. arg[2])
+			end
+			if arg[1] == "GDKPD CHECK" then
+				SendAddonMessage("GDKPD VER", MMM_Version_Id, "RAID")
+			end
 			if arg[1] == "GDKPD START" and self:PlayerIsML(sender, false) then
 				if not self:FetchFrameFromLink(arg[2]) then
 					local f = self:GetUnoccupiedFrame()
@@ -3754,6 +3708,8 @@ do
 end
 --end raid warning frame filter
 --register addon msg prefixes
+C_ChatInfo.RegisterAddonMessagePrefix("GDKPD CHECK")
+C_ChatInfo.RegisterAddonMessagePrefix("GDKPD VER")
 C_ChatInfo.RegisterAddonMessagePrefix("GDKPD START")
 C_ChatInfo.RegisterAddonMessagePrefix("GDKPD VREQ")
 C_ChatInfo.RegisterAddonMessagePrefix("GDKPD VDATA")

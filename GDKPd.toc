@@ -36,3 +36,4 @@ TempTables.lua
 GDKPd.lua
 CreatorTooltips.lua
 Minimap.lua
+MMMRules.lua
