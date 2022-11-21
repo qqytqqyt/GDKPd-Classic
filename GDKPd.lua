@@ -1645,7 +1645,7 @@ function balance:Update()
 		local f = self.entries[c]
 		f:Show()
 		f.amount:SetAmount(GDKPd_PotData.playerBalance[(UnitName("NPC"))])
-		MoneyInputFrame_SetCopper(TradePlayerInputMoneyFrame, (GDKPd_PotData.playerBalance[(UnitName("NPC"))] * 10000));
+		--MoneyInputFrame_SetCopper(TradePlayerInputMoneyFrame, (GDKPd_PotData.playerBalance[(UnitName("NPC"))] * 10000));
 		f.name:SetText((UnitName("NPC")))
 		f:UpdateHeight()
 		isWidthIncreased = f.mail:UpdateState() or isWidthIncreased
@@ -2325,7 +2325,7 @@ function GDKPd:GetUnoccupiedFrame()
 		c = c + 1
 	end
 	local f = CreateFrame("Frame", "GDKPdBidFrame" .. c, UIParent, BackdropTemplateMixin and "BackdropTemplate")
-	f:SetSize(300, 60)
+	f:SetSize(360, 60)
 	f:SetBackdrop({
 		bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
 		tileSize = 16,
@@ -2431,21 +2431,33 @@ function GDKPd:GetUnoccupiedFrame()
 	f.bidbox:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
 	f.bidbox:SetScript("OnEnterPressed", function(self)
 		self:ClearFocus()
-		local wantBid = self:GetNumber()
-		if wantBid >= (f.bidIncrement + f.curbidamount) then
-			SendChatMessage((f.isMultiBid and f.itemlink .. " " or "") .. wantBid, "RAID")
-		end
-		self:SetNumber(0)
 	end)
 	f.bidbox:SetBackdrop({ bgFile = "Interface\\ChatFrame\\UI-ChatInputBorder", tile = false })
 	f.bidbox:SetTextInsets(5, 5, 2, 2)
-	f.bidbox:SetSize(40, 16)
+	f.bidbox:SetSize(60, 16)
 	f.bidbox:SetFont("Fonts\\FRIZQT__.TTF", 9)
 	f.bidbox:SetAutoFocus(false)
 	f.bidbox:SetPoint("LEFT", f.curbid, "RIGHT", 5, 0)
 	f.bidbox:SetJustifyH("RIGHT")
 	f.bidbox:SetNumeric(true)
 	f.bidbox:SetNumber(0)
+	f.bidbox:SetScript("OnUpdate", function(self)
+		local wantBid = f.bidbox:GetNumber()
+		if wantBid < (f.bidIncrement + f.curbidamount) then
+			f.bid:Disable()
+			return
+		end
+
+		if wantBid >= f.maxBid then
+			f.bid:Disable()
+			return
+		end
+		
+		if f.bid.shouldEnable then
+			f.bid:Enable()
+			return
+		end
+	end)
 	f.bidbox:Hide()
 	f.bid = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
 	f.bid:SetText(L["Bid"])
@@ -2455,6 +2467,11 @@ function GDKPd:GetUnoccupiedFrame()
 		local newBid = f.curbidamount + f.bidIncrement
 		local wantBid = f.bidbox:GetNumber()
 		if wantBid < (f.bidIncrement + f.curbidamount) then
+			return
+		end
+
+		if wantBid > f.maxBid * 2 then
+			print("Please type a valid number in the box")
 			return
 		end
 		
@@ -2472,12 +2489,20 @@ function GDKPd:GetUnoccupiedFrame()
 		end
 	end)
 	f.bid:Disable()
+	f.bid.shouldEnable = false
 	f.bid.enabledelay = CreateFrame("Frame", nil, f.bid)
 	f.bid.enabledelay:Hide()
 	f.bid.enabledelay:SetScript("OnUpdate", function(self)
 		if not self.reenabletime then self:Hide() return end
 		if self.curbidamount and self.maxBid and self.curbidamount >= self.maxBid then return end
-		if GetTime() >= self.reenabletime then f.bid:Enable() self.reenabletime = nil self:Hide() end
+		if GetTime() >= self.reenabletime then 
+			f.bid.shouldEnable = true 
+
+			local wantBid = f.bidbox:GetNumber()
+			if wantBid > (f.bidIncrement + f.curbidamount) and wantBid < f.maxBid then
+				f.bid:Enable()
+			end
+			self.reenabletime = nil self:Hide() end
 	end)
 
 	f.roll = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
@@ -2612,7 +2637,7 @@ function GDKPd:GetUnoccupiedFrame()
 		self:EnableMouse(true)
 		self.autobid:Enable()
 		self.bidbox:Enable()
-		self.hide:Enable()
+		--self.hide:Enable()
 		self.highestbid:Hide()
 		self.itemlink = itemlink
 	end
@@ -2640,11 +2665,13 @@ function GDKPd:GetUnoccupiedFrame()
 		self.curbidismine = not not isMine
 		self.curbid:Show()
 		self.bidbox:Show()
+		self.bid.shouldEnable = true
 		self.bid:Enable()
 		self.roll:Enable()
 		self.increment:Enable()
 		if not isInitial then
 			self.bid:Disable()
+			self.bid.shouldEnable = false
 			self.roll:Disable()
 			self.increment:Disable()
 			if not isMine then
