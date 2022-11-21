@@ -1947,7 +1947,10 @@ function GDKPd:SetMovable(movable)
 	end
 end
 
-function GDKPd:GetStartBid(id)
+function GDKPd:GetStartBid(id, customStartPrice)
+	if customStartPrice then
+		return customStartPrice
+	end
 	local ilvl = (select(4, GetItemInfo(id)))
 	if self.opt.customItemSettings[id] then
 		return self.opt.customItemSettings[id].minBid
@@ -3299,11 +3302,12 @@ GDKPd:SetScript("OnEvent", function(self, event, ...)
 		LibStub("AceConfig-3.0"):RegisterOptionsTable("GDKPd", self.options)
 		SlashCmdList["GDKPD"] = function(input)
 			local cmd, link = input:match("(%S+)%s+(|c........|Hitem:.+|r)")
+			local _, _, customStartPrice = input:match("(%S+)%s+(|c........|Hitem:.+|r)%s+(%S+)")
 			if (cmd and cmd == "auction") and link then
 				if self:PlayerIsML((UnitName("player")), true) then
 					for itemLink in string.gmatch(link, "|c........|Hitem:.-|r") do
 						local itemID = tonumber(itemLink:match("|Hitem:(%d+):"))
-						self:QueueAuction(itemLink, GDKPd:GetStartBid(itemID), GDKPd:GetMinIncrement(itemID))
+						self:QueueAuction(itemLink, GDKPd:GetStartBid(itemID, customStartPrice), GDKPd:GetMinIncrement(itemID))
 					end
 				else
 					print(L["Cannot start auction without Master Looter privileges."])
