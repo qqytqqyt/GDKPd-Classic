@@ -2673,8 +2673,8 @@ function GDKPd:GetUnoccupiedFrame()
 		self.roll:Enable()
 		self.increment:Enable()
 		if not isInitial then
-			self.bid:Disable()
-			self.bid.shouldEnable = false
+			-- self.bid:Disable()
+			-- self.bid.shouldEnable = false
 			self.roll:Disable()
 			self.increment:Disable()
 			if not isMine then
