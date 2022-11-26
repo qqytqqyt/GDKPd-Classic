@@ -1,7 +1,7 @@
 MaxBidSmall = 5000
 MaxBidLarge = 15000
 
-MMM_Version_Id = 3
+MMM_Version_Id = 4
 
 LargeBidItems = 
 {
