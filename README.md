@@ -1,10 +1,28 @@
 # GDKPd
 
+<br>
+
+### **MMM GDKP 专用功能：**
+
+<br>
+
+* BID键，输入竞拍金额，点击BID键竞拍
+* ROLL键，点击后以物品上限金额竞拍，并ROLL点
+* INCREMENT键，点击后以单次最低金额竞拍，例：团长设置最低200每拍，当前金额1000，点击后以1200竞拍。
+
+<br>
+
+<img src="./assets/MMMgdkp.jpg" alt="图文说明" width="600"/>
+
+<br>
+
+### 原版通用功能：
+
 Automate Your GDKP Auctions, Bids, & Payouts in Classic WoW.
 
 <br>
 
-### :gem:  **KEY FEATURES**
+### **KEY FEATURES**
 
 <br>
 
