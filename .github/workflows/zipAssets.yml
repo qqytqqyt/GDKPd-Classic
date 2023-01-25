@@ -10,7 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Zip assets
-      run: cd .. && mkdir -p GDKPd && cp -R GDKPd-Classic/* GDKPd && rm -rf GDKPd/.git GDKPd/.github && zip -r GDKPd.zip GDKPd && mv GDKPd.zip GDKPd-Classic/
+      run: cd .. && mkdir -p GDKPd && cp -R GDKPd-Classic/* GDKPd && rm -rf GDKPd/.git && zip -r GDKPd.zip GDKPd && mv GDKPd.zip GDKPd-Classic/
     - name: Release to Github
       run: echo "Release"
     - name: Release
