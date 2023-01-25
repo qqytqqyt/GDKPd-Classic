@@ -2069,6 +2069,27 @@ function GDKPd:AuctionOffItem(item, minbid, increment)
 		local maxBid = MaxBidSmall
 		if (LargeBidItems[itemId]) then
 			maxBid = LargeBidItems[itemId]
+		else
+			local itemName, itemLink, itemQuality, itemLevel, itemMinLevel, itemType, itemSubType,
+			itemStackCount, itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType,
+			expacID, setID, isCraftingReagent = GetItemInfo(itemId) 
+			local inventoryType = C_Item.GetItemInventoryTypeByID(itemId)
+			if (itemLevel == 238) then
+				minbid = 4000
+				maxBid = 15000
+			elseif (itemLevel == 252) then
+				minbid = 5000
+				maxBid = 25000
+			elseif (itemQuality == 4 and itemLevel == 80) then
+				minbid = 2500
+				maxBid = 10000
+			elseif (inventoryType == 12) then
+				minbid = 4000
+				maxBid = 15000
+			else
+				minbid = 1000
+				maxBid = 5000
+			end
 		end
 		SendChatMessage((
 			"Bidding starts on %s. Starting bid %dg, minimum increment %dg. Maximum bid %dg. TTL: %d/%d"):
@@ -3303,7 +3324,7 @@ GDKPd:SetScript("OnEvent", function(self, event, ...)
 		SlashCmdList["GDKPD"] = function(input)
 			local cmd, link = input:match("(%S+)%s+(|c........|Hitem:.+|r)")
 			local _, _, customStartPrice = input:match("(%S+)%s+(|c........|Hitem:.+|r)%s+(%S+)")
-			if (cmd and cmd == "auction") and link then
+			if (cmd and cmd:lower() == "auction") and link then
 				if self:PlayerIsML((UnitName("player")), true) then
 					for itemLink in string.gmatch(link, "|c........|Hitem:.-|r") do
 						local itemID = tonumber(itemLink:match("|Hitem:(%d+):"))
