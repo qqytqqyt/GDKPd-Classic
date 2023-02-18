@@ -15,8 +15,9 @@
 
 自设命令：
 
-* /mg - 等同于/gdkpd 呼唤主窗口
-* /mg a {物品} {金额数字} - 通过命令实施竞拍 - 取代 /gdkpd auction
+* ```/mg``` -- 等同于/gdkpd 呼唤主窗口
+* ```/mg a {物品} {金额数字}``` - 通过命令实施竞拍 -- 取代 /gdkpd auction
+* ```/run C_ChatInfo.SendAddonMessage("GDKPD CHECK", {要求版本号}, "RAID")``` -- 检查版本
 
 <br>
 
