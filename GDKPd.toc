@@ -1,6 +1,6 @@
-## Title: GDKPd
+## Title: MMMGdkp
 ## Notes: Automate Your GDKP Auctions, Bids, & Payouts 
-## Author: Gogo, LemonDrake
+## Author: Soulu, qqytqqyt
 ## X-Credits: Poptix, Gallantron, Elwizard0, Keaarori, StolenLegacy
 
 ## Interface: 100002
