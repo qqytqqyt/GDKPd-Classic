@@ -16,7 +16,7 @@
 自设命令：
 
 * /mg - 等同于/gdkpd 呼唤主窗口
-* /mg a {物品} {金额数字} - 通过命令实施竞拍 - 等同于 /gdkpd auction
+* /mg a {物品} {金额数字} - 通过命令实施竞拍 - 取代 /gdkpd auction
 
 <br>
 
