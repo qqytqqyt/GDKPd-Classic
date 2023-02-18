@@ -2586,6 +2586,24 @@ function GDKPd:GetUnoccupiedFrame()
 		if GetTime() >= self.reenabletime then f.increment:Enable() self.reenabletime = nil self:Hide() end
 	end)
 
+	f.osrequest = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
+	function f.osrequest:Active() 
+		self:Enable()
+		self:SetText("OS")
+	end
+
+	function f.osrequest:Requested() 
+		self:Disable()
+		self:SetText("OS Requested")
+	end
+
+	f.osrequest:SetSize(80, 16)
+	f.osrequest:SetPoint("BOTTOM", f.increment, "RIGHT", 15, -16)
+	f.osrequest:Active()
+	f.osrequest:SetScript("OnClick", function(self)
+		SendChatMessage(f.itemlink .. " is OS wanted", "RAID")
+	end)
+
 	--f.hide = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
 	f.hide = CreateFrame("Button", nil, f, "UIPanelCloseButton")
 	--f.hide:SetText(L["Hide"])
@@ -2664,6 +2682,7 @@ function GDKPd:GetUnoccupiedFrame()
 		--self.hide:Enable()
 		self.highestbid:Hide()
 		self.itemlink = itemlink
+		self.osrequest:Active()
 	end
 
 	function f:SetCurBid(goldAmount, bidderName, isMine, isInitial)
@@ -3472,6 +3491,11 @@ GDKPd:SetScript("OnEvent", function(self, event, ...)
 					end
 				end
 			end
+			local osItem = msg:match("(|c........|Hitem:.+|r) is OS wanted")
+			if osItem then 
+				local osItemFrame = self:FetchFrameFromLink(osItem)
+				osItemFrame.osrequest:Requested()
+			end
 			local auctionEndItem = msg:match("Auction finished for (|c........|Hitem:.+|r).")
 			if auctionEndItem and GDKPd:PlayerIsML(sender, false) and self:FetchFrameFromLink(auctionEndItem) then
 				local f = self:FetchFrameFromLink(auctionEndItem)
@@ -3544,7 +3568,9 @@ GDKPd:SetScript("OnEvent", function(self, event, ...)
 				print(sender .. ": " .. arg[2])
 			end
 			if arg[1] == "GDKPD CHECK" then
-				SendAddonMessage("GDKPD VER", MMM_Version_Id, "RAID")
+				local message = tonumber(arg[2]) == MMM_Version_Id and MMM_Version_Id or MMM_Version_Id .. " - NEEDS UPDATE to latest: " .. arg[2]
+				SendAddonMessage("GDKPD VER", message, "RAID")
+
 			end
 			if arg[1] == "GDKPD START" and self:PlayerIsML(sender, false) then
 				if not self:FetchFrameFromLink(arg[2]) then
