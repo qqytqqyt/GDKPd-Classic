@@ -1,5 +1,5 @@
 local addonName, GDKPdGlobal = ...
--- GLOBALS: GDKPd, GDKPd_PotData, GDKPd_Anchor, GDKPd_BalanceData, SlashCmdList, SLASH_GDKPD1, SLASH_GDKPD2
+-- GLOBALS: GDKPd, GDKPd_PotData, GDKPd_Anchor, GDKPd_BalanceData, SlashCmdList, SLASH_GDKPD1, SLASH_GDKPD2, SLASH_GDKPD3
 -- fetch all used functions into locals to improve performance
 local table, tinsert, tremove, pairs, ipairs, unpack, math, tostring, tonumber, select, _G, strlen, setmetatable, string, print, next, type, rawget, date =
 table, tinsert, tremove, pairs, ipairs, unpack, math, tostring, tonumber, select, _G, strlen, setmetatable, string, print
@@ -2558,9 +2558,9 @@ function GDKPd:GetUnoccupiedFrame()
 	end)
 
 	f.increment = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
-	f.increment:SetText("Increment")
-	f.increment:SetSize(80, 16)
-	f.increment:SetPoint("BOTTOM", f.roll, "BOTTOM", 15, -16)
+	f.increment:SetText("+")
+	f.increment:SetSize(50, 16)
+	f.increment:SetPoint("BOTTOM", f.roll, "BOTTOM", 0, -16)
 	f.increment:SetScript("OnClick", function(self)
 		local newBid = f.curbidamount + f.bidIncrement
 		if (newBid >= f.maxBid) then
@@ -2594,11 +2594,11 @@ function GDKPd:GetUnoccupiedFrame()
 
 	function f.osrequest:Requested() 
 		self:Disable()
-		self:SetText("OS Requested")
+		self:SetText("OS wanted")
 	end
 
-	f.osrequest:SetSize(80, 16)
-	f.osrequest:SetPoint("BOTTOM", f.increment, "RIGHT", 15, -16)
+	f.osrequest:SetSize(70, 16)
+	f.osrequest:SetPoint("BOTTOM", f.increment, "RIGHT", 35, -8)
 	f.osrequest:Active()
 	f.osrequest:SetScript("OnClick", function(self)
 		SendChatMessage(f.itemlink .. " is OS wanted", "RAID")
@@ -3343,7 +3343,7 @@ GDKPd:SetScript("OnEvent", function(self, event, ...)
 		SlashCmdList["GDKPD"] = function(input)
 			local cmd, link = input:match("(%S+)%s+(|c........|Hitem:.+|r)")
 			local _, _, customStartPrice = input:match("(%S+)%s+(|c........|Hitem:.+|r)%s+(%S+)")
-			if (cmd and cmd:lower() == "auction") and link then
+			if (cmd and cmd:lower() == "a") and link then
 				if self:PlayerIsML((UnitName("player")), true) then
 					for itemLink in string.gmatch(link, "|c........|Hitem:.-|r") do
 						local itemID = tonumber(itemLink:match("|Hitem:(%d+):"))
@@ -3388,6 +3388,7 @@ GDKPd:SetScript("OnEvent", function(self, event, ...)
 
 		SLASH_GDKPD1 = "/gdkpd"
 		SLASH_GDKPD2 = "/gdkp"
+		SLASH_GDKPD3 = "/mg"
 		anchor:SetPoint(self.opt.point.point, UIParent, self.opt.point.relative, self.opt.point.x, self.opt.point.y)
 		self:SetMovable(self.opt.movable)
 		self.status.header:SetPoint(self.opt.statuspoint.point, UIParent, self.opt.statuspoint.relative, self.opt.statuspoint.x
