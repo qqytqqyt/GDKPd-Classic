@@ -1,4 +1,4 @@
-# GDKPd
+# MMMGdkp
 
 <br>
 
@@ -8,16 +8,7 @@
 
 * BID键，输入竞拍金额，点击BID键竞拍
 * ROLL键，点击后以物品上限金额竞拍，并ROLL点
-* \+ 键，点击后以单次最低金额竞拍，例：团长设置最低200每拍，当前金额1000，点击后以1200竞拍。
-* OS键，团员通过点击提示分配者此物品有OS需求，如MS没人要，可在之后开启OS竞拍
-
-<br>
-
-自设命令：
-
-* ```/mg``` -- 等同于/gdkpd 呼唤主窗口
-* ```/mg a {物品} {金额数字}``` - 通过命令实施竞拍 -- 取代 /gdkpd auction
-* ```/run C_ChatInfo.SendAddonMessage("GDKPD CHECK", {要求版本号}, "RAID")``` -- 检查版本
+* INCREMENT键，点击后以单次最低金额竞拍，例：团长设置最低200每拍，当前金额1000，点击后以1200竞拍。
 
 <br>
 
@@ -36,12 +27,12 @@ Automate Your GDKP Auctions, Bids, & Payouts in Classic WoW.
 <br>
 
 * Spend your raid playing the game -- not tracking bids or fumbling with tracking spreadsheets.
-* GDKPd picks up bids in raid chat, announces, high bidders, winners, pot amounts, etc.
-* NOTE: GDKPd is NOT required by raid members at all, only the Master Looter has to have it installed, but there are tools for bidders as well.
+* MMMGdkp picks up bids in raid chat, announces, high bidders, winners, pot amounts, etc.
+* NOTE: MMMGdkp is NOT required by raid members at all, only the Master Looter has to have it installed, but there are tools for bidders as well.
 
 <br>
 
-#### Taken from original add-on feature list. (https://www.wowace.com/projects/gdkpd)
+#### Taken from original add-on feature list. (https://www.wowace.com/projects/MMMGdkp)
 
 <br>
 
@@ -68,12 +59,12 @@ Features include:
 
 Slash command usage:
 
-* /gdkpd auction <itemlink> - Auction item
-* /gdkpd ver - Displays currently installed version
-* /gdkpd vercheck - Show the version check window
-* /gdkpd history - Show the history window
-* /gdkpd wipe - Wipe the history of pots (displays confirmation dialog)
-* /gdkpd <anything other than the above> - Open configuration dialog
+* /MMMGdkp auction <itemlink> - Auction item
+* /MMMGdkp ver - Displays currently installed version
+* /MMMGdkp vercheck - Show the version check window
+* /MMMGdkp history - Show the history window
+* /MMMGdkp wipe - Wipe the history of pots (displays confirmation dialog)
+* /MMMGdkp <anything other than the above> - Open configuration dialog
 
 <br>
 
@@ -81,11 +72,11 @@ Slash command usage:
 
 <br>
 
-Download from CurseForge : https://www.curseforge.com/wow/addons/gdkpdclassic
+Download from CurseForge : https://www.curseforge.com/wow/addons/MMMGdkpclassic
 
 Discord : https://discord.gg/HRQ2VZtphg
 
-Github : https://github.com/Gogo1951/GDKPd-Classic
+Github : https://github.com/Gogo1951/MMMGdkp-Classic
 
 <br>
 
@@ -93,7 +84,7 @@ Github : https://github.com/Gogo1951/GDKPd-Classic
 
 <br>
 
-Look... just a personal request. GDKPs get a bad rep because frankly a lot of people who run GDKPs are shady AF. This makes promoting GDKPd, and finding people to work on it really hard. Please stop being shady. For this add-on to be healthy, there needs to be some satisfaction that the work put in doesn't just make WoW a shittier place.
+Look... just a personal request. GDKPs get a bad rep because frankly a lot of people who run GDKPs are shady AF. This makes promoting MMMGdkp, and finding people to work on it really hard. Please stop being shady. For this add-on to be healthy, there needs to be some satisfaction that the work put in doesn't just make WoW a shittier place.
 
 Suggestions for running a good GDKP...
 
@@ -111,9 +102,9 @@ Suggestions for running a good GDKP...
 
 <br>
 
-GDKPs have risen in popularity in Classic WoW. The most popular auctioning add-on used is GDKPd, but it hasn't been well-maintained.
+GDKPs have risen in popularity in Classic WoW. The most popular auctioning add-on used is MMMGdkp, but it hasn't been well-maintained.
 
-I'm taking this project over for popt1x, but there are several versions of GDKPd available for download on CurseForge.
+I'm taking this project over for popt1x, but there are several versions of MMMGdkp available for download on CurseForge.
 
 I don't have any intent to make money off of this, I just want to fix it up for the current users.
 
@@ -127,11 +118,11 @@ Gogo
 
 <br>
 
-> GDKPdClassic; made by popt1x and last updated on 27 APR 2021 - https://www.curseforge.com/wow/addons/gdkpdclassic
+> MMMGdkpClassic; made by popt1x and last updated on 27 APR 2021 - https://www.curseforge.com/wow/addons/MMMGdkpclassic
 >
-> GDKPd Classic; made by elwizard0 and last updated on 29 SEP 2020 - https://www.curseforge.com/wow/addons/gdkpd-classic
+> MMMGdkp Classic; made by elwizard0 and last updated on 29 SEP 2020 - https://www.curseforge.com/wow/addons/MMMGdkp-classic
 >
-> GDKPd; made by gallantron and last updated on 27 OCT 2014 - https://www.curseforge.com/wow/addons/gdkpd
+> MMMGdkp; made by gallantron and last updated on 27 OCT 2014 - https://www.curseforge.com/wow/addons/MMMGdkp
 
 <br>
 
@@ -139,7 +130,7 @@ Gogo
 
 <br>
 
-#### Other Projects from the GDKPd Team
+#### Other Projects from the MMMGdkp Team
 
 <br>
 

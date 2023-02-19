@@ -92,4 +92,4 @@ LargeBidItems =
 [43954] = 100000,   
 }
 
---addon.minimapicon:Hide("GDKPdLDB")
+--addon.minimapicon:Hide("MMMGdkpLDB")

@@ -1,4 +1,4 @@
 local addonName, addon = ...
 
 
---addon.minimapicon:Hide("GDKPdLDB")
+--addon.minimapicon:Hide("MMMGdkpLDB")

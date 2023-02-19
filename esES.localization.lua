@@ -1,4 +1,4 @@
-local L = LibStub("AceLocale-3.0"):NewLocale("GDKPd", "esES")
+local L = LibStub("AceLocale-3.0"):NewLocale("MMMGdkp", "esES")
 if not L then return end
 
 L["Allow multiple simultanous auctions"] = "Permitir multiples subastas simultáneas" -- Needs review
@@ -34,11 +34,11 @@ L["Current bid: "] = "Puja actual:"
 L["Distribute"] = "Distribuir"
 L["Do not announce"] = "No anunciar"
 L["Do you want to save your pot or reset without saving? You can also add a note to the pot."] = "¿Quieres registrar tu bote o reiniciar sin salvar? También puedes añadir una nota al bote." -- Needs review
---[==[ L[ [=[Due to the changes to the addon message system implemented in patch 4.2, GDKPd is no longer able to communicate using its old version checking standard.
-Thus, this version of GDKPd will only be able to send and receive version checks from and to versions 1.2.0 and above of GDKPd.
-While all other functionalities of GDKPd should still be compatible with previous versions, we |cffff0000strongly recommend updating GDKPd to version 1.2.0 or above|r.]=] ] = [=[Due to the changes to the addon message system implemented in patch 4.2, GDKPd is no longer able to communicate using its old version checking standard.
-Thus, this version of GDKPd will only be able to send and receive version checks from and to versions 1.2.0 and above of GDKPd.
-While all other functionalities of GDKPd should still be compatible with previous versions, we |cffff0000strongly recommend updating GDKPd to version 1.2.0 or above|r.]=] ]==]
+--[==[ L[ [=[Due to the changes to the addon message system implemented in patch 4.2, MMMGdkp is no longer able to communicate using its old version checking standard.
+Thus, this version of MMMGdkp will only be able to send and receive version checks from and to versions 1.2.0 and above of MMMGdkp.
+While all other functionalities of MMMGdkp should still be compatible with previous versions, we |cffff0000strongly recommend updating MMMGdkp to version 1.2.0 or above|r.]=] ] = [=[Due to the changes to the addon message system implemented in patch 4.2, MMMGdkp is no longer able to communicate using its old version checking standard.
+Thus, this version of MMMGdkp will only be able to send and receive version checks from and to versions 1.2.0 and above of MMMGdkp.
+While all other functionalities of MMMGdkp should still be compatible with previous versions, we |cffff0000strongly recommend updating MMMGdkp to version 1.2.0 or above|r.]=] ]==]
 L["Enable"] = "Permitir"
 L["Enter the amount you want to add to player %s:"] = "Introduce la cantidad que quieres añadir al jugador %s:"
 L["Enter the amount you want to add to the pot:"] = "Introduce la cantidad que quieres añadir al bote:"
@@ -48,17 +48,17 @@ L["Enter the maximum amount of money you want to bid on %s:"] = "Introduce la ca
 L["Export"] = "Exportar"
 L["Frame alpha"] = "Alfa de ventanas" -- Needs review
 L["Frame scale"] = "Escala de ventanas"
-L["GDKPd auction history"] = "Historial de subastas GDKPd"
-L["GDKPd auction history for %s"] = "Historial de subastas GDKPd por %s"
---[==[ L[ [=[GDKPd: Drag to move
-/gdkpd and check "Lock" to hide]=] ] = [=[GDKPd: Drag to move
-/gdkpd and check "Lock" to hide]=] ]==]
+L["MMMGdkp auction history"] = "Historial de subastas MMMGdkp"
+L["MMMGdkp auction history for %s"] = "Historial de subastas MMMGdkp por %s"
+--[==[ L[ [=[MMMGdkp: Drag to move
+/MMMGdkp and check "Lock" to hide]=] ] = [=[MMMGdkp: Drag to move
+/MMMGdkp and check "Lock" to hide]=] ]==]
 L["Loot dropped: "] = "Loot caído:"
-L["GDKPd: No detailed data available"] = "GDKPd: Sin datos disponibles" -- Needs review
-L["This raid uses GDKPd to faciliate its GDKP bidding process. While you can bid on items without having GDKPd installed, installing it provides you with a GUI bidding panel, auto bidding functions, auction timers, chat filtering and more!"] = "Esta raid usa GDKPd para facilitar sus procesos de subasta GDKP. Aunque puedas pujar en objetos sin tener GDKPd instalado, instalarlo te provee de un panel GUI de pujas, funciones de auto pujas, cronómetros de subasta, filtros de chat ¡y más!"
--- L["GDKPd version %s. Packaged %s."] = "GDKPd version %s. Packaged %s."
-L["Your version of GDKPd is outdated and no longer compatible with the raid leader's in one or more functionalities. In order to ensure smooth performance, please update GDKPd."] = "Tu versión de GDKPd está desactualizada y no es compatible con la del líder de banda en una o más funciones. Para asegurar un funcionamiento preciso, por favor, actualiza GDKP."
-L["Your version of GDKPd is slightly outdated compared to the raid leader's. Full compability should be possible, however, you might want to take some time and update GDKPd."] = "Tu versión de GDKPd está ligeramente desactualizada comparada con la del líder de banda. Compatibilidad completa podría ser posible, sin embargo convendría que busques algo de tiempo y actualices GDKPd."
+L["MMMGdkp: No detailed data available"] = "MMMGdkp: Sin datos disponibles" -- Needs review
+L["This raid uses MMMGdkp to faciliate its GDKP bidding process. While you can bid on items without having MMMGdkp installed, installing it provides you with a GUI bidding panel, auto bidding functions, auction timers, chat filtering and more!"] = "Esta raid usa MMMGdkp para facilitar sus procesos de subasta GDKP. Aunque puedas pujar en objetos sin tener MMMGdkp instalado, instalarlo te provee de un panel GUI de pujas, funciones de auto pujas, cronómetros de subasta, filtros de chat ¡y más!"
+-- L["MMMGdkp version %s. Packaged %s."] = "MMMGdkp version %s. Packaged %s."
+L["Your version of MMMGdkp is outdated and no longer compatible with the raid leader's in one or more functionalities. In order to ensure smooth performance, please update MMMGdkp."] = "Tu versión de MMMGdkp está desactualizada y no es compatible con la del líder de banda en una o más funciones. Para asegurar un funcionamiento preciso, por favor, actualiza GDKP."
+L["Your version of MMMGdkp is slightly outdated compared to the raid leader's. Full compability should be possible, however, you might want to take some time and update MMMGdkp."] = "Tu versión de MMMGdkp está ligeramente desactualizada comparada con la del líder de banda. Compatibilidad completa podría ser posible, sin embargo convendría que busques algo de tiempo y actualices MMMGdkp."
 L["Hide"] = "Ocultar"
 L["Hide 'Auction cancelled' announcements"] = "Ocultar anuncios de 'Subasta cancelada'"
 L["Hide 'Auction cancelled' announcements from raid warning"] = "Ocultar anuncios de 'Subasta cancelada' de los avisos de raid"
@@ -93,7 +93,7 @@ L["Notification options"] = "Opciones de notificación"
 L["Notify outdated versions"] = "Notificar versiones desactualizadas"
 L["Notify outdated versions that are compatible with your version"] = "Notificar versiones desactualizadas que son compatibles con tu versión"
 L["Notify outdated versions that aren't compatible with your version"] = "Notificar versiones desactualizadas que no son compatibles con tu versión"
-L["Notify raid members that do not have GDKPd installed"] = "Notificar miembros de banda que no tienen GDKPd instalado"
+L["Notify raid members that do not have MMMGdkp installed"] = "Notificar miembros de banda que no tienen MMMGdkp instalado"
 -- L["Per-item settings"] = "Per-item settings"
 -- L["Player balance"] = "Player balance"
 L["Please enter the itemID of an item you want to drop here:"] = "Por favor introduzca el ID de un objeto que quieras soltar aqui:"
@@ -116,16 +116,16 @@ L["Stop bid"] = "Parar puja"
 L["The amount of seconds that have to pass after a bid before the auction is closed"] = "La cantidad de segundos que deben pasar tras una puja antes de que se cierre una subasta"
 L["The amount of seconds that have to pass before the auction is closed without bids recieved"] = "La cantidad de segundos que tienen que pasar antes de que la subasta se cierre sin pujas recibidas"
 L["Third bidder share"] = "Cuota del tercer postor"
-L["This player does not have GDKPd running or his version of GDKPd does not yet support version checks."] = "Este jugador no tiene GDKPd funcionando o su versión de GDKPd aún no soporta comprobaciones de versión."
-L["This player has the same version of GDKPd as you do. Full compability is ensured."] = "Este jugador tiene la misma versión de GDKPd que tú. Compatibilidad completa asegurada."
-L["This player's version of GDKPd is more advanced than yours. Please consult your Curse Client for updates or manually check the curse.com page."] = "La versión de GDKPd de este jugador es más avanzada que la tuya. Por favor consulta tu Curse Client por actualizaciones o inspecciona manualmente la pagina curse.com."
-L["This player's version of GDKPd is outdated and one or more functionalities are not compatible:"] = "La versión de GDKPd de este jugador está desactualizado y una o más funcionalidades no son compatibles."
-L["This player's version of GDKPd is outdated. However, their version should be fully compatible with yours."] = "La versión de GDKPd de este jugador está desactualizado. Aun así, su versión debería ser totalmente compatible con la tuya."
-L["This version of GDKPd was never functional due to internal errors."] = "Esta versión de GDKPd nunca fue funcional debido a errores internos."
+L["This player does not have MMMGdkp running or his version of MMMGdkp does not yet support version checks."] = "Este jugador no tiene MMMGdkp funcionando o su versión de MMMGdkp aún no soporta comprobaciones de versión."
+L["This player has the same version of MMMGdkp as you do. Full compability is ensured."] = "Este jugador tiene la misma versión de MMMGdkp que tú. Compatibilidad completa asegurada."
+L["This player's version of MMMGdkp is more advanced than yours. Please consult your Curse Client for updates or manually check the curse.com page."] = "La versión de MMMGdkp de este jugador es más avanzada que la tuya. Por favor consulta tu Curse Client por actualizaciones o inspecciona manualmente la pagina curse.com."
+L["This player's version of MMMGdkp is outdated and one or more functionalities are not compatible:"] = "La versión de MMMGdkp de este jugador está desactualizado y una o más funcionalidades no son compatibles."
+L["This player's version of MMMGdkp is outdated. However, their version should be fully compatible with yours."] = "La versión de MMMGdkp de este jugador está desactualizado. Aun así, su versión debería ser totalmente compatible con la tuya."
+L["This version of MMMGdkp was never functional due to internal errors."] = "Esta versión de MMMGdkp nunca fue funcional debido a errores internos."
 L["This version's player balance window will be unable to recognize distributions by you."] = "La ventana de balance de la version de este jugador sera incapaz de reconocer distribuciones realizadas por ti."
 L["This version will be unable to recognize auctions cancelled by you."] = "Esta version será incapaz de reconocer subastas canceladas por ti."
 L["This version will be unable to recognize auctions started by you."] = "Esta versión será incapaz de reconocer las subastas que tu comiences."
--- L["This version will be unable to recognize version check requests by you. Version check requests sent by this version of GDKPd will not be answered."] = "This version will be unable to recognize version check requests by you. Version check requests sent by this version of GDKPd will not be answered."
+-- L["This version will be unable to recognize version check requests by you. Version check requests sent by this version of MMMGdkp will not be answered."] = "This version will be unable to recognize version check requests by you. Version check requests sent by this version of MMMGdkp will not be answered."
 L[ [=[This will completely wipe your auction history and is IRREVERSIBLE.
 Are you completely SURE you want to do this?]=] ] = [=[Esto borrará completamente tu historial de subastas y es IRREVERSIBLE.
 ¿Estas completamente SEGURO de que quieres hacer esto?]=]
@@ -145,8 +145,8 @@ Are you certain you want to do this?]=] ] = [=[¡AVISO!
 ¿Estás seguro de que quieres hacer esto?]=]
 L["Wipe history"] = "Borrar historial"
 L[ [=[You have looted a monster!
-Do you want GDKPd to announce loot?]=] ] = [=[¡Has despojado un monstruo!
-¿Quieres que GDKPd anuncie el loot?]=]
+Do you want MMMGdkp to announce loot?]=] ] = [=[¡Has despojado un monstruo!
+¿Quieres que MMMGdkp anuncie el loot?]=]
 L[ [=[You have selected the current pot, size %d gold.
 What do you want to do with this pot?]=] ] = [=[Has seleccionado el bote actual, tamaño %s oro.
 ¿Qué quieres hacer con este bote?]=] -- Needs review

@@ -144,7 +144,7 @@ commit 0f5efa83444ef3ddc45369ac62325281b5b31816
 Author: poptix <poptix@gmail.com>
 Date:   Wed Jul 15 13:36:09 2020 -0500
 
-    Initial cleanup. Bump to version 2.0.0, remove all the [GDKPd] spam
+    Initial cleanup. Bump to version 2.0.0, remove all the [MMMGdkp] spam
 
 commit a8be0b865bd59185026597104eb51d3a6ffc00cf
 Author: poptix <poptix@gmail.com>

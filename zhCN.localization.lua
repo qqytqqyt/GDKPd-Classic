@@ -1,4 +1,4 @@
-local L = LibStub("AceLocale-3.0"):NewLocale("GDKPd", "zhCN")
+local L = LibStub("AceLocale-3.0"):NewLocale("MMMGdkp", "zhCN")
 if not L then return end
 
 L["Allow multiple simultanous auctions"] = "允许同时拍卖多项物品"
@@ -36,11 +36,11 @@ L["Current bid: "] = "当前报价"
 L["Distribute"] = "分配"
 L["Do not announce"] = "禁止通告"
 L["Do you want to save your pot or reset without saving? You can also add a note to the pot."] = "你想保存拍卖收入还是重置不保存?你也可以在拍卖收入中添加注释."
-L[ [=[Due to the changes to the addon message system implemented in patch 4.2, GDKPd is no longer able to communicate using its old version checking standard.
-Thus, this version of GDKPd will only be able to send and receive version checks from and to versions 1.2.0 and above of GDKPd.
-While all other functionalities of GDKPd should still be compatible with previous versions, we |cffff0000strongly recommend updating GDKPd to version 1.2.0 or above|r.]=] ] = [=[由于补丁4.2对于插件消息系统实现的改变，GDKPd已经不再使用旧的版本检查方式进行通信。
-所以此版本的GDKPd将只会发送和接受来自1.2.0及其以上版本的版本检查消息。
-同事GDKPd的其他所有功能应当仍然是与以前版本兼容的，我们|cffff0000强烈建议您将GDKPd升级到1.2.0及其以上版本|r.]=]
+L[ [=[Due to the changes to the addon message system implemented in patch 4.2, MMMGdkp is no longer able to communicate using its old version checking standard.
+Thus, this version of MMMGdkp will only be able to send and receive version checks from and to versions 1.2.0 and above of MMMGdkp.
+While all other functionalities of MMMGdkp should still be compatible with previous versions, we |cffff0000strongly recommend updating MMMGdkp to version 1.2.0 or above|r.]=] ] = [=[由于补丁4.2对于插件消息系统实现的改变，MMMGdkp已经不再使用旧的版本检查方式进行通信。
+所以此版本的MMMGdkp将只会发送和接受来自1.2.0及其以上版本的版本检查消息。
+同事MMMGdkp的其他所有功能应当仍然是与以前版本兼容的，我们|cffff0000强烈建议您将MMMGdkp升级到1.2.0及其以上版本|r.]=]
 L["Enable"] = "启用"
 L["Enter the amount you want to add to player %s:"] = "为玩家 %s 增加金额:"
 L["Enter the amount you want to add to the pot:"] = "输入你想添加进拍卖收入中的金额:"
@@ -50,17 +50,17 @@ L["Enter the maximum amount of money you want to bid on %s:"] = "输入你想对
 L["Export"] = "导出"
 L["Frame alpha"] = "框架透明度"
 L["Frame scale"] = "框架缩放"
-L["GDKPd auction history"] = "GDKPd拍卖记录"
-L["GDKPd auction history for %s"] = "GDKPd对 %s 的拍卖记录"
-L[ [=[GDKPd: Drag to move
-/gdkpd and check "Lock" to hide]=] ] = [=[GDKPd: 拖拽进行移动
-/gdkpd 命令，选中 "锁定" 以隐藏]=] -- Needs review
-L["Loot dropped: "] = "[GDKPd]物品掉落:"
-L["GDKPd: No detailed data available"] = "GDKPd: 无可用的详细数据"
-L["This raid uses GDKPd to faciliate its GDKP bidding process. While you can bid on items without having GDKPd installed, installing it provides you with a GUI bidding panel, auto bidding functions, auction timers, chat filtering and more!"] = "[GDKPd]本团队使用GDKPd来辅助拍卖.你也可以在未安装GDKPd的情况进行出价,安装本插件将可以使用出价面板,自动出价,拍卖计时器,聊天过滤等多种功能!"
-L["GDKPd version %s. Packaged %s."] = "GDKPd版本 %s. 打包于 %s."
-L["Your version of GDKPd is outdated and no longer compatible with the raid leader's in one or more functionalities. In order to ensure smooth performance, please update GDKPd."] = "[GDKPd]你的GDKPd版本过期且多项功能无法与团长使用的版本兼容.为了确保正常使用,请升级GDKPd."
-L["Your version of GDKPd is slightly outdated compared to the raid leader's. Full compability should be possible, however, you might want to take some time and update GDKPd."] = "[GDKPd]你的GDKPd版本比团长的版本稍低.也许可以与团长的版本兼容,然而你有必要花些时间升级你的GDKPd."
+L["MMMGdkp auction history"] = "MMMGdkp拍卖记录"
+L["MMMGdkp auction history for %s"] = "MMMGdkp对 %s 的拍卖记录"
+L[ [=[MMMGdkp: Drag to move
+/MMMGdkp and check "Lock" to hide]=] ] = [=[MMMGdkp: 拖拽进行移动
+/MMMGdkp 命令，选中 "锁定" 以隐藏]=] -- Needs review
+L["Loot dropped: "] = "[MMMGdkp]物品掉落:"
+L["MMMGdkp: No detailed data available"] = "MMMGdkp: 无可用的详细数据"
+L["This raid uses MMMGdkp to faciliate its GDKP bidding process. While you can bid on items without having MMMGdkp installed, installing it provides you with a GUI bidding panel, auto bidding functions, auction timers, chat filtering and more!"] = "[MMMGdkp]本团队使用MMMGdkp来辅助拍卖.你也可以在未安装MMMGdkp的情况进行出价,安装本插件将可以使用出价面板,自动出价,拍卖计时器,聊天过滤等多种功能!"
+L["MMMGdkp version %s. Packaged %s."] = "MMMGdkp版本 %s. 打包于 %s."
+L["Your version of MMMGdkp is outdated and no longer compatible with the raid leader's in one or more functionalities. In order to ensure smooth performance, please update MMMGdkp."] = "[MMMGdkp]你的MMMGdkp版本过期且多项功能无法与团长使用的版本兼容.为了确保正常使用,请升级MMMGdkp."
+L["Your version of MMMGdkp is slightly outdated compared to the raid leader's. Full compability should be possible, however, you might want to take some time and update MMMGdkp."] = "[MMMGdkp]你的MMMGdkp版本比团长的版本稍低.也许可以与团长的版本兼容,然而你有必要花些时间升级你的MMMGdkp."
 L["Hide"] = "隐藏"
 L["Hide 'Auction cancelled' announcements"] = "隐藏'拍卖已取消'的通告"
 L["Hide 'Auction cancelled' announcements from raid warning"] = "在团队警告中隐藏'拍卖已取消'的通告"
@@ -96,7 +96,7 @@ L["Notification options"] = "提示选项"
 L["Notify outdated versions"] = "提示过期版本"
 L["Notify outdated versions that are compatible with your version"] = "提示过期但是与你的版本兼容的版本"
 L["Notify outdated versions that aren't compatible with your version"] = "提示过期且与你的版本不兼容的版本"
-L["Notify raid members that do not have GDKPd installed"] = "提示团队中未安装GDKPd的人"
+L["Notify raid members that do not have MMMGdkp installed"] = "提示团队中未安装MMMGdkp的人"
 L["Per-item settings"] = "独立的物品设置"
 L["Player balance"] = "玩家余额" -- Needs review
 L["Please enter the itemID of an item you want to drop here:"] = "请在此输入你想要丢弃的物品ID:"
@@ -119,16 +119,16 @@ L["The amount of seconds between each announcement of the remaining time"] = "�
 L["The amount of seconds that have to pass after a bid before the auction is closed"] = "收到最后出价后直到拍卖成功所需要等待的秒数"
 L["The amount of seconds that have to pass before the auction is closed without bids recieved"] = "因未收到出价而结束拍卖所必须等待的秒数"
 L["Third bidder share"] = "第三出价者分享"
-L["This player does not have GDKPd running or his version of GDKPd does not yet support version checks."] = "该玩家没有安装GDKPd或他使用的版本不支持版本检查"
-L["This player has the same version of GDKPd as you do. Full compability is ensured."] = "该玩家使用了与你相同版本的GDKPd.保证了完全兼容"
-L["This player's version of GDKPd is more advanced than yours. Please consult your Curse Client for updates or manually check the curse.com page."] = "该玩家使用比你更高版本的GDKPd.请查看你的Curse Client进行升级或手动在curse.com升级本插件"
-L["This player's version of GDKPd is outdated and one or more functionalities are not compatible:"] = "该玩家使用了过期的GDKPd并且其多种功能与你的版本不兼容"
-L["This player's version of GDKPd is outdated. However, their version should be fully compatible with yours."] = "该玩家的GDKPd版本过期.但是他的版本应该可以与你的版本完全兼容"
-L["This version of GDKPd was never functional due to internal errors."] = "由于内部错误导致该版本GDKPd无法正常运行"
+L["This player does not have MMMGdkp running or his version of MMMGdkp does not yet support version checks."] = "该玩家没有安装MMMGdkp或他使用的版本不支持版本检查"
+L["This player has the same version of MMMGdkp as you do. Full compability is ensured."] = "该玩家使用了与你相同版本的MMMGdkp.保证了完全兼容"
+L["This player's version of MMMGdkp is more advanced than yours. Please consult your Curse Client for updates or manually check the curse.com page."] = "该玩家使用比你更高版本的MMMGdkp.请查看你的Curse Client进行升级或手动在curse.com升级本插件"
+L["This player's version of MMMGdkp is outdated and one or more functionalities are not compatible:"] = "该玩家使用了过期的MMMGdkp并且其多种功能与你的版本不兼容"
+L["This player's version of MMMGdkp is outdated. However, their version should be fully compatible with yours."] = "该玩家的MMMGdkp版本过期.但是他的版本应该可以与你的版本完全兼容"
+L["This version of MMMGdkp was never functional due to internal errors."] = "由于内部错误导致该版本MMMGdkp无法正常运行"
 L["This version's player balance window will be unable to recognize distributions by you."] = "此版本的玩家余额窗口将无法识别你的数额分配。" -- Needs review
 L["This version will be unable to recognize auctions cancelled by you."] = "此版本将无法识别你取消的拍卖"
 L["This version will be unable to recognize auctions started by you."] = "该版本将无法识别你发布的拍卖"
-L["This version will be unable to recognize version check requests by you. Version check requests sent by this version of GDKPd will not be answered."] = "此版本将无法识别版本检查请求。由此版本GDKPd发出的版本检查请求将不会被应答。"
+L["This version will be unable to recognize version check requests by you. Version check requests sent by this version of MMMGdkp will not be answered."] = "此版本将无法识别版本检查请求。由此版本MMMGdkp发出的版本检查请求将不会被应答。"
 L[ [=[This will completely wipe your auction history and is IRREVERSIBLE.
 Are you completely SURE you want to do this?]=] ] = [=[这么做会完全清除拍卖记录并且无法恢复.
 你很确定要这么做吗?]=]
@@ -148,8 +148,8 @@ Are you certain you want to do this?]=] ] = [=[警告！
 你确定要如此吗？]=] -- Needs review
 L["Wipe history"] = "灭团记录"
 L[ [=[You have looted a monster!
-Do you want GDKPd to announce loot?]=] ] = [=[你拾取了一个怪物的尸体!
-你想要GDKPd通告物品掉落吗?]=]
+Do you want MMMGdkp to announce loot?]=] ] = [=[你拾取了一个怪物的尸体!
+你想要MMMGdkp通告物品掉落吗?]=]
 L[ [=[You have selected the current pot, size %d gold.
 What do you want to do with this pot?]=] ] = [=[你选择了当前的拍卖收入,数量 %d 金.
 你想如何处理这些拍卖收入?

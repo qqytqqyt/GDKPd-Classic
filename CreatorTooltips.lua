@@ -2,8 +2,8 @@ local addonName, addon = ...
 
 --Script to generate GUID for a player
 --/run local name = UnitName("player"); local guid = UnitGUID("player"); ChatFrame1:AddMessage(name.." has the GUID: "..guid);
-addon.GDKPdDevs = {
-    -- GDKPd Team
+addon.MMMGdkpDevs = {
+    -- MMMGdkp Team
     ["Player-4800-048C8808"] = "Team Member", -- Gogodeekay-Eranikus
     ["Player-4800-048C887A"] = "Team Member", -- Gogodruid-Eranikus
     ["Player-4800-048C87ED"] = "Team Member", -- Gogohunter-Eranikus
@@ -30,11 +30,11 @@ GameTooltip:HookScript("OnTooltipSetUnit", function(...)
     if unittype then
         local curMouseOver = UnitGUID(unittype)
         if curMouseOver then
-            if addon.GDKPdDevs[curMouseOver] then
+            if addon.MMMGdkpDevs[curMouseOver] then
                 GameTooltip:AddLine(format("|TInterface\\AddOns\\" ..
-                    addonName .. "\\Images\\GDKPd:16:16:0:0|t %s : %s"
+                    addonName .. "\\Images\\MMMGdkp:16:16:0:0|t %s : %s"
                     ,
-                    addonName, addon.GDKPdDevs[curMouseOver]))
+                    addonName, addon.MMMGdkpDevs[curMouseOver]))
             end
         end
     end
