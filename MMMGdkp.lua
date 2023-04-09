@@ -22,7 +22,40 @@ for s in REALM_SEPARATORS:gmatch(".") do tinsert(REALM_SEPARATOR_LIST, s) end
 -- table handling to prevent any memory leakage from accumulating.
 local emptytable = select(2, ...).emptytable
 
+local MMMGdkp_ProcessingItems = {}
+
 local DEBUGFORCEVERSION
+
+local MMMGdkp_waitFrame = nil;
+local MMMGdkp_waitTable = {};
+
+function MMMGdkp_wait(delay, func, ...)
+	if(type(delay)~="number" or type(func)~="function") then
+	  return false;
+	end
+	if (MMMGdkp_waitFrame == nil) then
+	  MMMGdkp_waitFrame = CreateFrame("Frame","MMMGdkp_waitFrame", UIParent);
+	  MMMGdkp_waitFrame:SetScript("onUpdate",function (self,elapse)
+		local count = #MMMGdkp_waitTable;
+		local i = 1;
+		while(i<=count) do
+		  local waitRecord = tremove(MMMGdkp_waitTable,i);
+		  local d = tremove(waitRecord,1);
+		  local f = tremove(waitRecord,1);
+		  local p = tremove(waitRecord,1);
+		  if(d>elapse) then
+			tinsert(MMMGdkp_waitTable,i,{d-elapse,f,p});
+			i = i + 1;
+		  else
+			count = count - 1;
+			f(unpack(p));
+		  end
+		end
+	  end);
+	end
+	tinsert(MMMGdkp_waitTable,{delay,func,{...}});
+	return true;
+  end
 
 --[===[@debug@
 DEBUGFORCEVERSION="2.0.0"
@@ -1962,6 +1995,7 @@ function MMMGdkp:GetStartBid(id, customStartPrice)
 			end
 		end
 	end
+	
 	return self.opt.startBid
 end
 
@@ -2049,16 +2083,25 @@ function MMMGdkp:AnnounceLoot(shouldQueueAuctions)
 	lootList:Release()
 end
 
-function MMMGdkp:QueueAuction(item, minbid, increment)
+function QueueAuctionOS(item, minbid, increment)
 	if (not MMMGdkp.curAuction.item) or MMMGdkp.opt.allowMultipleAuctions then
-		MMMGdkp:AuctionOffItem(item, minbid, increment)
+		MMMGdkp:AuctionOffItem(item, minbid, increment, true)
 	else
 		SendAddonMessage("MMMGdkp START", item, "RAID")
 		tinsert(MMMGdkp.auctionList, emptytable(item, minbid, increment))
 	end
 end
 
-function MMMGdkp:AuctionOffItem(item, minbid, increment)
+function MMMGdkp:QueueAuction(item, minbid, increment)
+	if (not MMMGdkp.curAuction.item) or MMMGdkp.opt.allowMultipleAuctions then
+		MMMGdkp:AuctionOffItem(item, minbid, increment, false)
+	else
+		SendAddonMessage("MMMGdkp START", item, "RAID")
+		tinsert(MMMGdkp.auctionList, emptytable(item, minbid, increment))
+	end
+end
+
+function MMMGdkp:AuctionOffItem(item, minbid, increment, os)
 	if (MMMGdkp.curAuction.item) and (not self.opt.allowMultipleAuctions) then return end
 	if (self.opt.allowMultipleAuctions) and (self.curAuctions[item]) then return end
 	if (not self.opt.allowMultipleAuctions) then
@@ -2067,30 +2110,36 @@ function MMMGdkp:AuctionOffItem(item, minbid, increment)
 		-- new code
 		local itemId = GetItemInfoFromHyperlink(item)
 		local maxBid = MaxBidSmall
+		local itemName, itemLink, itemQuality, itemLevel, itemMinLevel, itemType, itemSubType,
+		itemStackCount, itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType,
+		expacID, setID, isCraftingReagent = GetItemInfo(itemId) 
+		local inventoryType = C_Item.GetItemInventoryTypeByID(itemId)
+		if (itemLevel == 238) then
+			minbid = 4000
+			maxBid = 15000
+		elseif (itemLevel == 252) then
+			minbid = 5000
+			maxBid = 25000
+		elseif (itemQuality == 4 and itemLevel == 80) then
+			minbid = 2500
+			maxBid = 10000
+		elseif (inventoryType == 12) then
+			minbid = 4000
+			maxBid = 15000
+		else
+			minbid = 1000
+			maxBid = 5000
+		end
 		if (LargeBidItems[itemId]) then
 			maxBid = LargeBidItems[itemId]
-		else
-			local itemName, itemLink, itemQuality, itemLevel, itemMinLevel, itemType, itemSubType,
-			itemStackCount, itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType,
-			expacID, setID, isCraftingReagent = GetItemInfo(itemId) 
-			local inventoryType = C_Item.GetItemInventoryTypeByID(itemId)
-			if (itemLevel == 238) then
-				minbid = 4000
-				maxBid = 15000
-			elseif (itemLevel == 252) then
-				minbid = 5000
-				maxBid = 25000
-			elseif (itemQuality == 4 and itemLevel == 80) then
-				minbid = 2500
-				maxBid = 10000
-			elseif (inventoryType == 12) then
-				minbid = 4000
-				maxBid = 15000
-			else
-				minbid = 1000
-				maxBid = 5000
-			end
 		end
+		if os then
+			minbid = minbid / 2
+		end
+
+		MMMGdkp_ProcessingItems[itemId] = {}
+		MMMGdkp_ProcessingItems[itemId].itemLink = itemLink
+		MMMGdkp_ProcessingItems[itemId].maxRoll = 0
 		SendChatMessage((
 			"Bidding starts on %s. Starting bid %dg, minimum increment %dg. Maximum bid %dg. TTL: %d/%d"):
 			format(item, minbid, increment, maxBid, self.opt.auctionTimer, self.opt.auctionTimerRefresh),
@@ -2102,6 +2151,7 @@ function MMMGdkp:AuctionOffItem(item, minbid, increment)
 		aucTable.bidders = emptytable()
 		aucTable.timeRemains = self.opt.auctionTimer
 		MMMGdkp.curAuctions[item] = aucTable
+		MMMGdkp.curAuctions[item].canOs = not os
 	end
 	MMMGdkp:Show()
 end
@@ -2166,7 +2216,9 @@ function MMMGdkp:FinishAuction(link)
 		if not link then return end
 		local aucdata = self.curAuctions[link]
 		if aucdata then
-			table.sort(aucdata.bidders, function(a, b) return a.bidAmount > b.bidAmount end)
+			if not aucdata.maxBid or not tonumber(aucdata.maxBid) == tonumber(totalAmount) then
+				table.sort(aucdata.bidders, function(a, b) return a.bidAmount > b.bidAmount end)
+			end
 			if aucdata.bidders[1] then
 				local totalAmount = aucdata.bidders[1].bidAmount
 				local remAmount = totalAmount
@@ -2184,7 +2236,8 @@ function MMMGdkp:FinishAuction(link)
 				paymentString = paymentString:format(remAmount)
 				
 				if aucdata.maxBid and tonumber(aucdata.maxBid) == tonumber(totalAmount) then					
-					SendChatMessage(("Auction finished for %s. %s. Please check who won the roll."):format(link, paymentString), "RAID")
+					SendChatMessage(("Auction finished for %s. Winner: %s. %s."):format(link, aucdata.bidders[1].bidderName,
+						paymentString), "RAID")
 				else
 					SendChatMessage(("Auction finished for %s. Winner: %s. %s."):format(link, aucdata.bidders[1].bidderName,
 						paymentString), "RAID")
@@ -2218,6 +2271,13 @@ function MMMGdkp:FinishAuction(link)
 				end
 			else
 				SendChatMessage(("Auction finished for %s. No bids recieved."):format(link), "RAID")
+				if (aucdata.osWanted) then
+					local itemID = tonumber(link:match("|Hitem:(%d+):"))
+					aucdata:Release()
+					self.curAuctions[link] = nil
+					
+					MMMGdkp_wait(2, QueueAuctionOS, link, MMMGdkp:GetStartBid(itemID), MMMGdkp:GetMinIncrement(itemID) / 2)
+				end
 			end
 			aucdata:Release()
 		end
@@ -2502,7 +2562,7 @@ function MMMGdkp:GetUnoccupiedFrame()
 		if (wantBid >= f.maxBid) then
 			wantBid = f.maxBid
 			if (not self.rolled) then
-				RandomRoll(1, 100)
+				RandomRoll(f.itemId, f.itemId + 999)
 			end
 			self.rolled = true
 		end
@@ -2546,7 +2606,7 @@ function MMMGdkp:GetUnoccupiedFrame()
 		else
 			SendChatMessage(tostring(newBid), "RAID")
 		end
-		RandomRoll(1, 100)
+		RandomRoll(f.itemId, f.itemId + 999)
 	end)
 
 	f.roll:Disable()
@@ -2566,7 +2626,7 @@ function MMMGdkp:GetUnoccupiedFrame()
 		if (newBid >= f.maxBid) then
 			newBid = f.maxBid
 			if (not self.rolled) then
-				RandomRoll(1, 100)
+				RandomRoll(f.itemId, f.itemId + 999)
 			end
 			self.rolled = true
 		end
@@ -2694,9 +2754,10 @@ function MMMGdkp:GetUnoccupiedFrame()
 			self.highestbidder:SetText(L["Highest bidder: %s"]:format(bidderName))
 			self.highestbid:Hide()
 		elseif isMine then
-			self.highestbid:SetText("You are the top bidder!")
 			if self.maxBid and tonumber(goldAmount) >= tonumber(self.maxBid) then
-				self.highestbid:SetText("You are one of the top bidders!")
+				-- self.highestbid:SetText("You are one of the top bidders!")
+			else
+			   self.highestbid:SetText("You are the top bidder!")
 			end
 			self.highestbid:Show()
 			self.highestbidder:Hide()
@@ -3403,6 +3464,29 @@ MMMGdkp:SetScript("OnEvent", function(self, event, ...)
 		MMMGdkp.opt.showAuctionDurationTimer = true
 		MMMGdkp.opt.showAuctionDurationTimerText = true
 	end
+	if (event == "CHAT_MSG_SYSTEM") then
+		local msg, sender = arg[1], pruneCrossRealm(arg[2])
+		local rollPattern = "(.+) rolls (%d+) %((%d+)%-(%d+)%)"
+		local name, roll, rollMin, rollMax = msg:match(rollPattern)
+		if (name and roll and rollMin and rollMax) then
+			rollMin = tonumber(rollMin)
+			name = pruneCrossRealm(name)
+			roll = roll - rollMin + 1
+			local itemId = rollMin
+			if (MMMGdkp_ProcessingItems[itemId] ~= nil) then
+				if (MMMGdkp_ProcessingItems[itemId].maxRoll < roll) then
+					MMMGdkp_ProcessingItems[itemId].maxRoll = roll
+					SendChatMessage(("%s rolls on item %s: %d HIGHEST ROLL!"):format(name, 
+						MMMGdkp_ProcessingItems[itemId].itemLink, roll),
+						(self.opt.announceBidRaidWarning and (IsRaidOfficer() or IsRaidLeader())) and "RAID_WARNING" or "RAID")
+				else
+					SendChatMessage(("%s rolls on item %s: %d"):format(name,
+						MMMGdkp_ProcessingItems[itemId].itemLink, roll),
+						(self.opt.announceBidRaidWarning and (IsRaidOfficer() or IsRaidLeader())) and "RAID_WARNING" or "RAID")
+				end
+			end
+		end
+	end
 	if (event == "CHAT_MSG_RAID") or (event == "CHAT_MSG_RAID_LEADER") or (event == "CHAT_MSG_RAID_WARNING") then
 		local msg, sender = arg[1], pruneCrossRealm(arg[2])
 		
@@ -3410,15 +3494,28 @@ MMMGdkp:SetScript("OnEvent", function(self, event, ...)
 		-- deleted
 		-- this is new code for multi-auction. slight variations are used rl-side to indicate this.
 		do
+			local highestName, rollItemLink, rollPoint = string.match(msg, "(%S+) rolls on item (|c........|Hitem:.+|r): (%d+) HIGHEST ROLL!")
+			if highestName and rollItemLink then
+				local f = self:FetchFrameFromLink(rollItemLink)
+				local aucdata = self.curAuctions[rollItemLink]
+				if (f ~= nil and aucdata ~= nil) then
+					aucdata.bidders[1].bidderName = highestName
+					f.highestbid:SetText(("Top roller: %s (%d)"):format(highestName, rollPoint))
+				end
+			end
+
 			local itemLink, minBid, bidIncrement, maxBid, auctionTimer, auctionTimerRefresh = string.match(msg,
 				"Bidding starts on (|c........|Hitem:.+|r). Starting bid (%d+)g, minimum increment (%d+)g. Maximum bid (%d+)g. TTL: (%d+)/(%d+)")
 
-				
 			auctionTimer = tonumber(auctionTimer) or 0
 			auctionTimerRefresh = tonumber(auctionTimerRefresh) or 0
 			
 			if itemLink and self:PlayerIsML(sender, false) then
 				
+				local itemId = GetItemInfoFromHyperlink(itemLink)
+				MMMGdkp_ProcessingItems[itemId] = {}
+				MMMGdkp_ProcessingItems[itemId].itemLink = itemLink
+				MMMGdkp_ProcessingItems[itemId].maxRoll = 0
 				if not self.ignoredLinks[itemLink] then
 
 					local itemId = GetItemInfoFromHyperlink(itemLink)
@@ -3445,6 +3542,7 @@ MMMGdkp:SetScript("OnEvent", function(self, event, ...)
 					self.ignoredLinks[itemLink] = nil
 				end
 			end
+			
 			local bidItemLink, bidAmount = msg:match("(|c........|Hitem:.+|r)%s*([0-9]+%.?[0-9]*)[kK]")
             if not bidItemLink then
                 bidItemLink, bidAmount = msg:match("(|c........|Hitem:.+|r)%s*(%d+)")
@@ -3494,12 +3592,26 @@ MMMGdkp:SetScript("OnEvent", function(self, event, ...)
 			end
 			local osItem = msg:match("(|c........|Hitem:.+|r) is OS wanted")
 			if osItem then 
-				local osItemFrame = self:FetchFrameFromLink(osItem)
-				osItemFrame.osrequest:Requested()
+				local aucdata = self.curAuctions[osItem]
+				if (aucdata) then
+					local f = self:FetchFrameFromLink(osItem)
+					if (aucdata.bidders[1] == nil and f) then
+						f.highestbid:SetText("OS Requested")
+						f.highestbid:Show()
+					end
+
+					if (aucdata.canOs) then
+						aucdata.osWanted = true
+					else
+						SendChatMessage(("%s is already on OS auction."):format(osItem), "RAID")
+					end
+				end
 			end
 			local auctionEndItem = msg:match("Auction finished for (|c........|Hitem:.+|r).")
 			if auctionEndItem and MMMGdkp:PlayerIsML(sender, false) and self:FetchFrameFromLink(auctionEndItem) then
 				local f = self:FetchFrameFromLink(auctionEndItem)
+				local itemId = GetItemInfoFromHyperlink(auctionEndItem)
+				MMMGdkp_ProcessingItems[itemId] = nil
 				f.isActive = false
 				f:Hide()
 				local winnerName, paymentString = msg:match("Auction finished for |c........|Hitem:.+|r%. Winner: (%S+)%. (.+)")
@@ -3534,6 +3646,8 @@ MMMGdkp:SetScript("OnEvent", function(self, event, ...)
 			end
 			local auctionCancelItem = msg:match("Auction cancelled for (|c........|Hitem:.+|r)%.")
 			if auctionCancelItem and MMMGdkp:PlayerIsML(sender, false) and self:FetchFrameFromLink(auctionCancelItem) then
+				local itemId = GetItemInfoFromHyperlink(auctionCancelItem)
+				MMMGdkp_ProcessingItems[itemId] = nil
 				local f = self:FetchFrameFromLink(auctionCancelItem)
 				f.isActive = false
 				if MMMGdkp:PlayerIsML((UnitName("player")), true) then
@@ -3710,6 +3824,8 @@ MMMGdkp:RegisterEvent("PLAYER_REGEN_ENABLED")
 MMMGdkp:RegisterEvent("PLAYER_REGEN_DISABLED")
 MMMGdkp:RegisterEvent("MAIL_INBOX_UPDATE")
 MMMGdkp:RegisterEvent("MAIL_CLOSED")
+MMMGdkp:RegisterEvent("CHAT_MSG_SYSTEM")
+
 
 --chat filters
 local function filterChat_CHAT_MSG_RAID(chatframe, event, msg)
