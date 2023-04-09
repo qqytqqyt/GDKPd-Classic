@@ -2790,7 +2790,7 @@ function MMMGdkp:GetUnoccupiedFrame()
 					self.roll.enabledelay:Show()
 				end
 			end
-			if goldAmount > (self.initialBid or math.huge) then
+			if tonumber(goldAmount) > (tonumber(self.initialBid) or math.huge) then
 				self.reverseBid:Enable()
 			end
 		else
@@ -3492,6 +3492,12 @@ MMMGdkp:SetScript("OnEvent", function(self, event, ...)
 				local f = self:FetchFrameFromLink(rollItemLinkML)
 				local bidAmount = f.maxBid
 
+				if highestNameML and f then
+					local isSelf = pruneCrossRealm(highestNameML) == (UnitName("player"))
+					f:SetCurBid(tonumber(bidAmount), highestNameML, isSelf)
+					f:ResetAuctionTimer()
+				end
+
 				if self.curAuctions[rollItemLinkML] then
 					local aucdata = self.curAuctions[rollItemLinkML]
 
@@ -3511,10 +3517,10 @@ MMMGdkp:SetScript("OnEvent", function(self, event, ...)
 							aucdata.bidders[highestNameML] = #aucdata.bidders
 						end
 
-					if not aucdata.announedMax then
+					if not aucdata.announcedMax then
 						SendChatMessage(("New highest bidder on %s: %s (%d gold)"):format(rollItemLinkML, highestNameML, bidAmount),
 							(self.opt.announceBidRaidWarning and (IsRaidOfficer() or IsRaidLeader())) and "RAID_WARNING" or "RAID")
-						aucdata.announedMax = true
+						aucdata.announcedMax = true
 					end
 
 					aucdata.timeRemains = math.max(aucdata.timeRemains, self.opt.auctionTimerRefresh)
