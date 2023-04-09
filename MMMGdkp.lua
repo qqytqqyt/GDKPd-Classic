@@ -3470,7 +3470,7 @@ MMMGdkp:SetScript("OnEvent", function(self, event, ...)
 		MMMGdkp.opt.showAuctionDurationTimerText = true
 	end
 	if (event == "CHAT_MSG_SYSTEM") then
-		local msg, sender = arg[1], pruneCrossRealm(arg[2])
+		local msg = arg[1]
 		local rollPattern = "(.+) rolls (%d+) %((%d+)%-(%d+)%)"
 		local name, roll, rollMin, rollMax = msg:match(rollPattern)
 		name = pruneCrossRealm(name)
@@ -3514,6 +3514,7 @@ MMMGdkp:SetScript("OnEvent", function(self, event, ...)
 					aucdata.rolled = true
 				end
 				if (f ~= nil) then
+					f.highestbidder:SetText("")
 					f.highestbid:SetText(("Top roller: %s (%d)"):format(highestName, rollPoint))
 					f.highestbid:Show()
 				end
