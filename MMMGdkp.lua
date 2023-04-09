@@ -28,6 +28,7 @@ local DEBUGFORCEVERSION
 
 local MMMGdkp_waitFrame = nil;
 local MMMGdkp_waitTable = {};
+local myRolledItem = nil
 
 function MMMGdkp_wait(delay, func, ...)
 	if(type(delay)~="number" or type(func)~="function") then
@@ -2276,7 +2277,7 @@ function MMMGdkp:FinishAuction(link)
 					aucdata:Release()
 					self.curAuctions[link] = nil
 					
-					MMMGdkp_wait(2, QueueAuctionOS, link, MMMGdkp:GetStartBid(itemID), MMMGdkp:GetMinIncrement(itemID) / 2)
+					MMMGdkp_wait(2, QueueAuctionOS, link, MMMGdkp:GetStartBid(itemID), MMMGdkp:GetMinIncrement(itemID))
 				end
 			end
 			aucdata:Release()
@@ -2562,7 +2563,8 @@ function MMMGdkp:GetUnoccupiedFrame()
 		if (wantBid >= f.maxBid) then
 			wantBid = f.maxBid
 			if (not self.rolled) then
-				RandomRoll(f.itemId, f.itemId + 999)
+				myRolledItem = f.itemlink
+				RandomRoll(1, 100)
 			end
 			self.rolled = true
 		end
@@ -2606,7 +2608,8 @@ function MMMGdkp:GetUnoccupiedFrame()
 		else
 			SendChatMessage(tostring(newBid), "RAID")
 		end
-		RandomRoll(f.itemId, f.itemId + 999)
+		myRolledItem = f.itemlink
+		RandomRoll(1, 100)
 	end)
 
 	f.roll:Disable()
@@ -2626,7 +2629,8 @@ function MMMGdkp:GetUnoccupiedFrame()
 		if (newBid >= f.maxBid) then
 			newBid = f.maxBid
 			if (not self.rolled) then
-				RandomRoll(f.itemId, f.itemId + 999)
+				myRolledItem = f.itemlink
+				RandomRoll(1, 100)
 			end
 			self.rolled = true
 		end
@@ -3469,22 +3473,13 @@ MMMGdkp:SetScript("OnEvent", function(self, event, ...)
 		local msg, sender = arg[1], pruneCrossRealm(arg[2])
 		local rollPattern = "(.+) rolls (%d+) %((%d+)%-(%d+)%)"
 		local name, roll, rollMin, rollMax = msg:match(rollPattern)
-		if (name and roll and rollMin and rollMax) then
+		name = pruneCrossRealm(name)
+		if (name and roll and rollMin and rollMax and name == pruneCrossRealm(UnitName("player"))) then
 			rollMin = tonumber(rollMin)
-			name = pruneCrossRealm(name)
-			roll = roll - rollMin + 1
-			local itemId = rollMin
-			if (MMMGdkp_ProcessingItems[itemId] ~= nil and MMMGdkp:PlayerIsML((UnitName("player")), true)) then
-				if (MMMGdkp_ProcessingItems[itemId].maxRoll < roll) then
-					MMMGdkp_ProcessingItems[itemId].maxRoll = roll
-					SendChatMessage(("%s rolls on item %s: %d HIGHEST ROLL!"):format(name, 
-						MMMGdkp_ProcessingItems[itemId].itemLink, roll),
-						(self.opt.announceBidRaidWarning and (IsRaidOfficer() or IsRaidLeader())) and "RAID_WARNING" or "RAID")
-				else
-					SendChatMessage(("%s rolls on item %s: %d"):format(name,
-						MMMGdkp_ProcessingItems[itemId].itemLink, roll),
-						(self.opt.announceBidRaidWarning and (IsRaidOfficer() or IsRaidLeader())) and "RAID_WARNING" or "RAID")
-				end
+			rollMax = tonumber(rollMax)
+			if (rollMin == 1 and rollMax == 100) then
+				SendChatMessage(("%s rolls on item %s: %d"):format(name, myRolledItem, roll), "RAID")
+				myRolledItem = nil
 			end
 		end
 	end
@@ -3495,6 +3490,20 @@ MMMGdkp:SetScript("OnEvent", function(self, event, ...)
 		-- deleted
 		-- this is new code for multi-auction. slight variations are used rl-side to indicate this.
 		do
+			local highestNameML, rollItemLinkML, rollPointML = string.match(msg, "(%S+) rolls on item (|c........|Hitem:.+|r): (%d+)")
+			if highestNameML and rollItemLinkML then
+				rollPointML = tonumber(rollPointML)
+				local itemId = GetItemInfoFromHyperlink(rollItemLinkML)
+				if (MMMGdkp_ProcessingItems[itemId] ~= nil and MMMGdkp:PlayerIsML((UnitName("player")), true)) then
+					if (MMMGdkp_ProcessingItems[itemId].maxRoll < rollPointML) then
+						MMMGdkp_ProcessingItems[itemId].maxRoll = rollPointML
+						SendChatMessage(("%s rolls on item %s: %d HIGHEST ROLL!"):format(highestNameML, 
+							MMMGdkp_ProcessingItems[itemId].itemLink, rollPointML),
+							(self.opt.announceBidRaidWarning and (IsRaidOfficer() or IsRaidLeader())) and "RAID_WARNING" or "RAID")
+					end
+				end
+			end
+
 			local highestName, rollItemLink, rollPoint = string.match(msg, "(%S+) rolls on item (|c........|Hitem:.+|r): (%d+) HIGHEST ROLL!")
 			if highestName and rollItemLink then
 				local f = self:FetchFrameFromLink(rollItemLink)
