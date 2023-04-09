@@ -2216,7 +2216,7 @@ function MMMGdkp:FinishAuction(link)
 		if not link then return end
 		local aucdata = self.curAuctions[link]
 		if aucdata then
-			if not aucdata.maxBid or not tonumber(aucdata.maxBid) == tonumber(totalAmount) then
+			if not aucdata.rolled then
 				table.sort(aucdata.bidders, function(a, b) return a.bidAmount > b.bidAmount end)
 			end
 			if aucdata.bidders[1] then
@@ -3500,7 +3500,9 @@ MMMGdkp:SetScript("OnEvent", function(self, event, ...)
 				local f = self:FetchFrameFromLink(rollItemLink)
 				local aucdata = self.curAuctions[rollItemLink]
 				if (aucdata ~= nil) then
+					table.sort(aucdata.bidders, function(a, b) return a.bidAmount > b.bidAmount end)
 					aucdata.bidders[1].bidderName = highestName
+					aucdata.rolled = true
 				end
 				if (f ~= nil) then
 					f.highestbid:SetText(("Top roller: %s (%d)"):format(highestName, rollPoint))
