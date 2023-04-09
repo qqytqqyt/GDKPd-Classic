@@ -5,6 +5,9 @@ MMM_Version_Id = 7
 
 LargeBidItems = 
 {
+-- algaron
+[46053] = 25000,
+
 -- test
 [22720] = 15000,   
 

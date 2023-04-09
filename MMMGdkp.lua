@@ -2662,6 +2662,7 @@ function MMMGdkp:GetUnoccupiedFrame()
 	f.osrequest:Active()
 	f.osrequest:SetScript("OnClick", function(self)
 		SendChatMessage(f.itemlink .. " is OS wanted", "RAID")
+		f.osrequest:Disable()
 	end)
 
 	--f.hide = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
@@ -3473,7 +3474,7 @@ MMMGdkp:SetScript("OnEvent", function(self, event, ...)
 			name = pruneCrossRealm(name)
 			roll = roll - rollMin + 1
 			local itemId = rollMin
-			if (MMMGdkp_ProcessingItems[itemId] ~= nil) then
+			if (MMMGdkp_ProcessingItems[itemId] ~= nil and MMMGdkp:PlayerIsML((UnitName("player")), true)) then
 				if (MMMGdkp_ProcessingItems[itemId].maxRoll < roll) then
 					MMMGdkp_ProcessingItems[itemId].maxRoll = roll
 					SendChatMessage(("%s rolls on item %s: %d HIGHEST ROLL!"):format(name, 
@@ -3498,9 +3499,12 @@ MMMGdkp:SetScript("OnEvent", function(self, event, ...)
 			if highestName and rollItemLink then
 				local f = self:FetchFrameFromLink(rollItemLink)
 				local aucdata = self.curAuctions[rollItemLink]
-				if (f ~= nil and aucdata ~= nil) then
+				if (aucdata ~= nil) then
 					aucdata.bidders[1].bidderName = highestName
+				end
+				if (f ~= nil) then
 					f.highestbid:SetText(("Top roller: %s (%d)"):format(highestName, rollPoint))
+					f.highestbid:Show()
 				end
 			end
 
@@ -3592,21 +3596,30 @@ MMMGdkp:SetScript("OnEvent", function(self, event, ...)
 			end
 			local osItem = msg:match("(|c........|Hitem:.+|r) is OS wanted")
 			if osItem then 
-				local aucdata = self.curAuctions[osItem]
-				if (aucdata) then
-					local f = self:FetchFrameFromLink(osItem)
-					if (aucdata.bidders[1] == nil and f) then
-						f.highestbid:SetText("OS Requested")
-						f.highestbid:Show()
-					end
+				local f = self:FetchFrameFromLink(osItem)
+				if (f and (f.highestbid == nil or f.highestbid:GetText() == nil or not f.highestbid:IsShown())) then
+					f.highestbid:SetText("OS Requested")
+					f.highestbid:Show()
+				end
 
-					if (aucdata.canOs) then
+				if MMMGdkp:PlayerIsML((UnitName("player")), true) then
+					local aucdata = self.curAuctions[osItem]
+					if (aucdata and aucdata.canOs) then
 						aucdata.osWanted = true
 					else
 						SendChatMessage(("%s is already on OS auction."):format(osItem), "RAID")
 					end
 				end
 			end
+
+			local osItemDeclined = msg:match("(|c........|Hitem:.+|r) is already on OS auction.")
+			if osItemDeclined then 
+				local f = self:FetchFrameFromLink(osItemDeclined)
+				if (f and f.highestbid:GetText() == "OS Requested") then
+					f.highestbid:SetText("")
+				end
+			end
+
 			local auctionEndItem = msg:match("Auction finished for (|c........|Hitem:.+|r).")
 			if auctionEndItem and MMMGdkp:PlayerIsML(sender, false) and self:FetchFrameFromLink(auctionEndItem) then
 				local f = self:FetchFrameFromLink(auctionEndItem)
