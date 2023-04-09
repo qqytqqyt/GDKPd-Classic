@@ -2568,7 +2568,7 @@ function MMMGdkp:GetUnoccupiedFrame()
 			end
 			self.rolled = true
 		end
-		if f.isMultiBid then
+		if f.isMultiBid and not self.rolled then
 			SendChatMessage(f.itemlink .. " " .. wantBid, "RAID")
 		else
 			SendChatMessage(tostring(wantBid), "RAID")
@@ -2603,11 +2603,6 @@ function MMMGdkp:GetUnoccupiedFrame()
 		end
 
 		f.rolled = true
-		if f.isMultiBid then
-			SendChatMessage(f.itemlink .. " " .. newBid, "RAID")
-		else
-			SendChatMessage(tostring(newBid), "RAID")
-		end
 		myRolledItem = f.itemlink
 		RandomRoll(1, 100)
 	end)
@@ -2634,7 +2629,7 @@ function MMMGdkp:GetUnoccupiedFrame()
 			end
 			self.rolled = true
 		end
-		if f.isMultiBid then
+		if f.isMultiBid and not self.rolled then
 			SendChatMessage(f.itemlink .. " " .. newBid, "RAID")
 		else
 			SendChatMessage(tostring(newBid), "RAID")
@@ -3473,7 +3468,9 @@ MMMGdkp:SetScript("OnEvent", function(self, event, ...)
 		local msg = arg[1]
 		local rollPattern = "(.+) rolls (%d+) %((%d+)%-(%d+)%)"
 		local name, roll, rollMin, rollMax = msg:match(rollPattern)
-		name = pruneCrossRealm(name)
+		if name then
+			name = pruneCrossRealm(name)
+		end
 		if (name and roll and rollMin and rollMax and name == pruneCrossRealm(UnitName("player"))) then
 			rollMin = tonumber(rollMin)
 			rollMax = tonumber(rollMax)
@@ -3492,6 +3489,38 @@ MMMGdkp:SetScript("OnEvent", function(self, event, ...)
 		do
 			local highestNameML, rollItemLinkML, rollPointML = string.match(msg, "(%S+) rolls on item (|c........|Hitem:.+|r): (%d+)")
 			if highestNameML and rollItemLinkML then
+				local f = self:FetchFrameFromLink(rollItemLinkML)
+				local bidAmount = f.maxBid
+
+				if self.curAuctions[rollItemLinkML] then
+					local aucdata = self.curAuctions[rollItemLinkML]
+
+					local itemId = GetItemInfoFromHyperlink(rollItemLinkML)
+					maxBid = MaxBidSmall
+					if (LargeBidItems[itemId]) then
+						maxBid = LargeBidItems[itemId]
+					end
+					aucdata.maxBid = maxBid 
+					bidAmount = tonumber(bidAmount)
+					if (aucdata.curBid + aucdata.increment) <= bidAmount or maxBid <= bidAmount then
+						aucdata.curBid = bidAmount
+						if aucdata.bidders[highestNameML] then
+							aucdata.bidders[aucdata.bidders[highestNameML]].bidAmount = bidAmount
+						else
+							tinsert(aucdata.bidders, { bidAmount = bidAmount, bidderName = highestNameML })
+							aucdata.bidders[highestNameML] = #aucdata.bidders
+						end
+
+					if not aucdata.announedMax then
+						SendChatMessage(("New highest bidder on %s: %s (%d gold)"):format(rollItemLinkML, highestNameML, bidAmount),
+							(self.opt.announceBidRaidWarning and (IsRaidOfficer() or IsRaidLeader())) and "RAID_WARNING" or "RAID")
+						aucdata.announedMax = true
+					end
+
+					aucdata.timeRemains = math.max(aucdata.timeRemains, self.opt.auctionTimerRefresh)
+					end
+				end
+
 				rollPointML = tonumber(rollPointML)
 				local itemId = GetItemInfoFromHyperlink(rollItemLinkML)
 				if (MMMGdkp_ProcessingItems[itemId] ~= nil and MMMGdkp:PlayerIsML((UnitName("player")), true)) then
