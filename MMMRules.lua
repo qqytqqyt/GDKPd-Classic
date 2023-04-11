@@ -1,10 +1,13 @@
 MaxBidSmall = 5000
 MaxBidLarge = 15000
 
-MMM_Version_Id = 6
+MMM_Version_Id = 7
 
 LargeBidItems = 
 {
+-- algaron
+[46053] = 25000,
+
 -- test
 [22720] = 15000,   
 
