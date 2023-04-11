@@ -3483,8 +3483,8 @@ MMMGdkp:SetScript("OnEvent", function(self, event, ...)
 			rollMax = tonumber(rollMax)
 			if (rollMin == 1 and rollMax == 100 and myRolledItem ~= nil) then
 				SendChatMessage(("%s rolls on item %s: %d"):format(name, myRolledItem, roll), "RAID")
-				local f = self:FetchFrameFromLink(rollItemLinkML)
-				f.roll:SetText(rollPointML)
+				local f = self:FetchFrameFromLink(myRolledItem)
+				f.roll:SetText(roll)
 				myRolledItem = nil
 			end
 		end
