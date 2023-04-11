@@ -2153,6 +2153,8 @@ function MMMGdkp:AuctionOffItem(item, minbid, increment, os)
 		aucTable.timeRemains = self.opt.auctionTimer
 		MMMGdkp.curAuctions[item] = aucTable
 		MMMGdkp.curAuctions[item].canOs = not os
+		MMMGdkp.curAuctions[item].isOS = os
+		MMMGdkp.FetchFrameFromLink(itemLink)
 	end
 	MMMGdkp:Show()
 end
@@ -2592,7 +2594,7 @@ function MMMGdkp:GetUnoccupiedFrame()
 	end)
 
 	f.roll = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
-	f.roll:SetText("Roll")
+	f.roll:SetText('Roll')
 	f.roll:SetSize(50, 16)
 	f.roll:SetPoint("LEFT", f.bid, "LEFT", -55, 0)
 	f.rolled = false
@@ -2735,7 +2737,12 @@ function MMMGdkp:GetUnoccupiedFrame()
 		end
 
 		self.icon:SetTexture((select(10, GetItemInfo(itemlink))))
-		self.itemstring:SetText(itemlink .. " Max: " .. tostring(self.maxBid) .. "g")
+		local isOs = MMMGdkp.curAuctions[itemlink].isOS
+		if (isOs) then
+			self.itemstring:SetText("OS - " .. itemlink .. " Max: " .. tostring(self.maxBid) .. "g")
+		else 
+			self.itemstring:SetText(itemlink .. " Max: " .. tostring(self.maxBid) .. "g")
+		end
 		self:EnableMouse(true)
 		self.autobid:Enable()
 		self.bidbox:Enable()
@@ -3474,7 +3481,7 @@ MMMGdkp:SetScript("OnEvent", function(self, event, ...)
 		if (name and roll and rollMin and rollMax and name == pruneCrossRealm(UnitName("player"))) then
 			rollMin = tonumber(rollMin)
 			rollMax = tonumber(rollMax)
-			if (rollMin == 1 and rollMax == 100) then
+			if (rollMin == 1 and rollMax == 100 and myRolledItem ~= nil) then
 				SendChatMessage(("%s rolls on item %s: %d"):format(name, myRolledItem, roll), "RAID")
 				myRolledItem = nil
 			end
@@ -3495,6 +3502,7 @@ MMMGdkp:SetScript("OnEvent", function(self, event, ...)
 				if highestNameML and f then
 					local isSelf = pruneCrossRealm(highestNameML) == (UnitName("player"))
 					f:SetCurBid(tonumber(bidAmount), highestNameML, isSelf)
+					f.roll:SetText(rollPointML)
 					f:ResetAuctionTimer()
 				end
 
@@ -3674,6 +3682,7 @@ MMMGdkp:SetScript("OnEvent", function(self, event, ...)
 				MMMGdkp_ProcessingItems[itemId] = nil
 				f.isActive = false
 				f:Hide()
+				f.roll:SetText('Roll')
 				local winnerName, paymentString = msg:match("Auction finished for |c........|Hitem:.+|r%. Winner: (%S+)%. (.+)")
 				if winnerName then
 					if pruneCrossRealm(winnerName) == (UnitName("player")) then
@@ -3719,7 +3728,9 @@ MMMGdkp:SetScript("OnEvent", function(self, event, ...)
 					f.bidbox:Hide()
 					f.bid:Disable()
 					f.autobid:Disable()
+					f.roll:SetText('Roll')
 				else
+					f.roll:SetText('Roll')
 					f:Hide()
 				end
 			end
