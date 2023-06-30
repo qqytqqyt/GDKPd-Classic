@@ -1,7 +1,24 @@
-MaxBidSmall = 5000
-MaxBidLarge = 15000
+MaxBidSmall = 10000
+MaxBidLarge = 25000
+MinBidSmall = 1000
+MinBidLarge = 10000
 
-MMM_Version_Id = 7
+MMM_Version_Id = 8
+
+BidItemsRange = 
+{
+    [238] = '1000-15000',
+    [252] = '5000-25000',
+    [245] = '1000-20000',
+    [258] = '2000-25000',
+    [272] = '5000-100000',
+    ['Token'] = '2000-25000',
+    ['Trinket'] = '5000-100000',
+    ['Weapon'] = '4000-50000',
+    --- item IDs
+    [49096] = '10000-100000',
+    [47242] = '1000-20000',
+}
 
 LargeBidItems = 
 {
