@@ -2125,7 +2125,6 @@ local function getBidRange(itemId)
 	elseif (itemQuality == 4 and itemLevel == 80) then
 		itemRef = "Token"
 	end
-	print(itemRef)
 	if(BidItemsRange[itemRef]) then
 		local minVal, maxVal = string.match(BidItemsRange[itemRef], "(%d+)%-(%d+)")
 		minVal = tonumber(minVal)
@@ -2150,8 +2149,6 @@ function MMMGdkp:AuctionOffItem(item, minbid, increment, os)
 		itemStackCount, itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType,
 		expacID, setID, isCraftingReagent = GetItemInfo(itemId) 
 		local minVal, maxVal = getBidRange(itemId)
-		print(minVal)
-		print(maxVal)
 
 		if (minVal and maxVal) then
 			maxBid = maxVal
