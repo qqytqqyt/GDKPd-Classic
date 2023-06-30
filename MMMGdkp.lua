@@ -2102,6 +2102,41 @@ function MMMGdkp:QueueAuction(item, minbid, increment)
 	end
 end
 
+local function IsWeapon(itemLink)
+	local _, _, _, _, _, itemType, itemSubType = GetItemInfo(itemLink)
+	if itemType == "Weapon" or (itemType == "Armor" and itemSubType == "Shields") then
+	  return true
+	end
+	return false
+  end
+
+local function getBidRange(itemId)
+	local itemName, itemLink, itemQuality, itemLevel, itemMinLevel, itemType, itemSubType,
+	itemStackCount, itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType,
+	expacID, setID, isCraftingReagent = GetItemInfo(itemId) 
+	local inventoryType = C_Item.GetItemInventoryTypeByID(itemId)
+	local itemRef = itemLevel
+	if(BidItemsRange[itemId]) then 
+		itemRef = itemId
+	elseif itemType == "Weapon" or (itemType == "Armor" and itemSubType == "Shields") then
+		itemRef = "Weapon"
+	elseif (inventoryType == 12) then
+		itemRef = "Trinket"
+	elseif (itemQuality == 4 and itemLevel == 80) then
+		itemRef = "Token"
+	end
+	print(itemRef)
+	if(BidItemsRange[itemRef]) then
+		local minVal, maxVal = string.match(BidItemsRange[itemRef], "(%d+)%-(%d+)")
+		minVal = tonumber(minVal)
+		maxVal = tonumber(maxVal)
+		return minVal, maxVal
+	else
+		return nil, nil
+	end
+end
+
+
 function MMMGdkp:AuctionOffItem(item, minbid, increment, os)
 	if (MMMGdkp.curAuction.item) and (not self.opt.allowMultipleAuctions) then return end
 	if (self.opt.allowMultipleAuctions) and (self.curAuctions[item]) then return end
@@ -2114,26 +2149,17 @@ function MMMGdkp:AuctionOffItem(item, minbid, increment, os)
 		local itemName, itemLink, itemQuality, itemLevel, itemMinLevel, itemType, itemSubType,
 		itemStackCount, itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType,
 		expacID, setID, isCraftingReagent = GetItemInfo(itemId) 
-		local inventoryType = C_Item.GetItemInventoryTypeByID(itemId)
-		if (itemLevel == 238) then
-			minbid = 4000
-			maxBid = 15000
-		elseif (itemLevel == 252) then
-			minbid = 5000
-			maxBid = 25000
-		elseif (itemQuality == 4 and itemLevel == 80) then
-			minbid = 2500
-			maxBid = 10000
-		elseif (inventoryType == 12) then
-			minbid = 4000
-			maxBid = 15000
-		else
-			minbid = 1000
-			maxBid = 5000
-		end
-		if (LargeBidItems[itemId]) then
+		local minVal, maxVal = getBidRange(itemId)
+		print(minVal)
+		print(maxVal)
+
+		if (minVal and maxVal) then
+			maxBid = maxVal
+			minbid = minVal
+		elseif (LargeBidItems[itemId]) then
 			maxBid = LargeBidItems[itemId]
 		end
+
 		if os then
 			minbid = minbid / 2
 			SendChatMessage((
