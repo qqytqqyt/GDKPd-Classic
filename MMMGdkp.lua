@@ -2119,9 +2119,15 @@ local function getBidRange(itemId)
 	if(BidItemsRange[itemId]) then 
 		itemRef = itemId
 	elseif itemType == "Weapon" or (itemType == "Armor" and itemSubType == "Shields") then
-		itemRef = "Weapon"
+		local WeapRef = string.format("Weapon-%d", itemLevel)
+		if(BidItemsRange[WeapRef]) then
+			itemRef = WeapRef
+		end
 	elseif (inventoryType == 12) then
-		itemRef = "Trinket"
+		local TrinketRef = string.format("Trinket-%d", itemLevel)
+		if(BidItemsRange[TrinketRef]) then
+			itemRef = TrinketRef
+		end
 	elseif (itemQuality == 4 and itemLevel == 80) then
 		itemRef = "Token"
 	end
