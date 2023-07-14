@@ -3,7 +3,7 @@ MaxBidLarge = 100000
 MinBidSmall = 1000
 MinBidLarge = 2000
 
-MMM_Version_Id = 8
+MMM_Version_Id = 9
 
 BidItemsRange = 
 {
