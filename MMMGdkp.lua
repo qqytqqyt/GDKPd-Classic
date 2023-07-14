@@ -2598,13 +2598,13 @@ function MMMGdkp:GetUnoccupiedFrame()
 		
 		if (wantBid >= f.maxBid) then
 			wantBid = f.maxBid
-			if (not self.rolled) then
+			if (not f.rolled) then
 				myRolledItem = f.itemlink
 				RandomRoll(1, 100)
 			end
-			self.rolled = true
+			f.rolled = true
 		end
-		if f.isMultiBid and not self.rolled then
+		if f.isMultiBid then
 			SendChatMessage(f.itemlink .. " " .. wantBid, "RAID")
 		else
 			SendChatMessage(tostring(wantBid), "RAID")
@@ -2659,13 +2659,14 @@ function MMMGdkp:GetUnoccupiedFrame()
 		local newBid = f.curbidamount + f.bidIncrement
 		if (newBid >= f.maxBid) then
 			newBid = f.maxBid
-			if (not self.rolled) then
+			if (not f.rolled) then
 				myRolledItem = f.itemlink
 				RandomRoll(1, 100)
 			end
-			self.rolled = true
+			f.rolled = true
 		end
-		if f.isMultiBid and not self.rolled then
+
+		if f.isMultiBid then
 			SendChatMessage(f.itemlink .. " " .. newBid, "RAID")
 		else
 			SendChatMessage(tostring(newBid), "RAID")
